@@ -4,12 +4,15 @@ authors:
   - key: mohamed
   - key: yash
   - key: chichih
+  - name: External Collaborator
+    url: http://link.com
+    affiliation: Somewhere
 tags:
   - ml systems
   - gpu programming
   - generative ai
 venue: none
-year: 2024
+year: 2025
 date: 2025-06-01
 teaser: A short description of the blog post 
 materials:

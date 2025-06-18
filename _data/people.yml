@@ -109,6 +109,7 @@ aditya:
   title: Undergrad Researcher
   alumni: true
   next: MS at USC
+  affiliation: USC
 
 allan:
   name: Allan Zhang
@@ -122,6 +123,7 @@ julian:
 osman:
   name: EmirOsman Murtazayev
   title: Undergrad Researcher
+  affiliation: CUNY
 
 
 # visiting researchers
@@ -131,9 +133,11 @@ marta:
   url: https://www.linkedin.com/in/marta-andronic-192190170/?originalSubdomain=uk
   title: Visiting Researcher
   alumni: true
+  affiliation: Imperial
 
 ussama:
   name: Ussama Zahid
   url: https://www.linkedin.com/in/ussamazahid96/
   title: Visiting Researcher
   alumni: true
+  affiliation: KAUST
