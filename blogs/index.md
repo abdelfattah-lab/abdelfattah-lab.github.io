@@ -4,7 +4,7 @@ layout: page
 ---
 <div id="blogs" class="pure-g">
   <div id="content" class="pure-u-1 pure-u-md-3-4">
-    <h1 class="title">Blogs</h1>
+    <h1 class="title">Blog</h1>
 
     {% assign blogYears = site.blogs | group_by:"year" | sort: "date" | reverse %}
     {% for year in blogYears %}

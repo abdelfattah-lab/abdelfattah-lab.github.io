@@ -32,7 +32,7 @@
     {% assign person = site.data.people[author.key] %}
     {% capture affiliation %}
       {% if person %}
-        {{author.affiliation | default: person.affiliation | default: 'Stanford'}}
+        {{author.affiliation | default: person.affiliation | default: 'Cornell'}}
       {% else %}
         {{author.affiliation}}
       {% endif %}
@@ -94,7 +94,7 @@
                 <span class="name">{{author.name | default:person.name}}{% if author.equal %}*{% endif %}</span>
                 <span class="affiliation">
                   {% if person %}
-                    {{author.affiliation | default: person.affiliation | default: 'Stanford'}}
+                    {{author.affiliation | default: person.affiliation | default: 'Cornell'}}
                   {% else %}
                     {{author.affiliation}}
                   {% endif %}
@@ -193,5 +193,13 @@
       </div>
     </div>
   </div>
+  <script src="https://utteranc.es/client.js"
+        repo="abdelfattah-lab/abdelfattah-lab.github.io"
+        issue-term="pathname"
+        label="blog_comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+  </script>
 </body>
 </html>

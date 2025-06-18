@@ -1,4 +1,4 @@
-# Scaling Intelligence Lab Website
+# Abdelfattah Research Group Website
 
 ## Dev Instructions
 
@@ -17,3 +17,9 @@ bundle exec jekyll serve
 ```
 - Check localhost:4000 for your content
   
+
+## Content Instructions
+
+- Add news by adding a new entry to `_data/news.yml`.
+- Add blogs by adding a markdown file to `_blogs`.
+- Add publications by adding a markdown file to `_pubs`.

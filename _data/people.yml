@@ -1,101 +1,139 @@
-azaliamirhoseini:
-  name: Azalia Mirhoseini
-  url: http://azaliamirhoseini.com/
+mohamed:
+  name: Mohamed Abdelfattah
+  url: https://mohsaied.com
   title: Assistant Professor
 
-# PhDs
-jordanjuravsky:
-  name: Jordan Juravsky
-  url: https://www.jordanjuravsky.com/
+# graduate students
+
+yash:
+  name: Yash Akhauri
+  url: https://akhauriyash.github.io/
   title: PhD Student
 
-jonsaadfalcon:
-  name: Jon Saad-Falcon
-  url: https://jonsaadfalcon.com/
+jordan:
+  name: Jordan Dotzel
+  url: https://www.linkedin.com/in/dotzel/
+  title: PhD Student
+  alumni: true
+  next: Google Research
+
+ahmed:
+  name: Ahmed Fathy
+  url: https://www.linkedin.com/in/aabouelhamayed/
   title: PhD Student
 
-# Visiting
+yuzong:
+  name: Yuzong Chen
+  url: https://yc2367.github.io/
+  title: PhD Student
 
-bradleybrown:
-  name: Bradley Brown
-  url: https://www.bradbrown.ca/
-  title: Visiting Student Researcher
+chichih:
+  name: Chi-Chih Chang
+  url: https://ccchang.info/
+  title: PhD Student
 
-# Researchers
+xilai:
+  name: Xilai Dai
+  url: https://www.linkedin.com/in/xilai-dai/
+  title: PhD Student
 
-ryanehrlich:
-  name: Ryan Ehrlich
-  url: https://www.linkedin.com/in/ryan-ehrlich-68a60b11a/
-  title: Researcher
+chunting:
+  name: Chun-Ting Chen
+  url: https://www.linkedin.com/in/chun-ting-chen-71939a243/
+  title: PhD Student
 
-shloknatarajan:
-  name: Shlok Natarajan
-  url: https://www.linkedin.com/in/shloknatarajan/
-  title: Master's Researcher
+jake:
+  name: Jake Hyun
+  url: https://jakehyun.com/
+  title: PhD Student
 
-# Masters
+yassine:
+  name: Yassine Ghannane
+  url: http://arvindsatya.com
+  title: MS Student
+  alumni: true
+  next: PhD at U of Copenhagen
 
-# Undergrads
 
-tanvirbhathal:
-  name: Tanvir Bhathal
-  url: https://www.linkedin.com/in/tanvir-bhathal/
-  title: Undergraduate Student
+# undergrads / MEng
 
-robbymanihani:
-  name: Robby Manihani
-  url: https://www.linkedin.com/in/grmanihani/
-  title: Undergraduate Student
+junius:
+  name: Junius Pun
+  url: https://www.linkedin.com/in/juniuspun/
+  title: Undergrad Researcher
+  alumni: true
+  next: STMicroelectronics
 
-caiacostello:
-  name: Caia Costello
-  url: https://www.linkedin.com/in/caia-costello-5b4064216
-  title: Undergraduate Student
+kristine:
+  name: Kristine Pham
+  title: Undergrad Researcher
+  alumni: true
 
-adriangamarralafuente:
-  name: Adrian Gamarra Lafuente
-  url: https://www.linkedin.com/in/adrian-gamarra/
-  title: Undergraduate Student
+zhanqiu:
+  name: Zhanqiu Hu
+  url: https://www.linkedin.com/in/zhanqiu-hu-5a602317a/
+  title: Undergrad Researcher
+  alumni: true
+  next: PhD at Cornell
 
-je-yong:
-  name: Je-Yong Lee
-  url: https://www.linkedin.com/in/jeyong-lee-523ba2258/?originalSubdomain=uk
-  title: Undergraduate Collaborator
-  affiliation: University of Oxford
-  not_current: True
+rahul:
+  name: Rahul Jain
+  url: https://www.linkedin.com/in/jainr3/
+  title: MEng Researcher
+  alumni: true
+  next: MIT Lincoln Lab
 
-lukelee:
-  name: Donghyun Lee
-  url: https://www.linkedin.com/in/donghyun-lee-aa789422a/
-  title: Undergraduate Collaborator
-  affiliation: University College London
-  not_current: True
+rebecca:
+  name: Rebecca Helling
+  title: MEng Researcher
+  alumni: true
 
-# Rotating
-anneouyang:
-  name: Anne Ouyang
-  url: https://anneouyang.com/
-  title: Rotating PhD Student
+anthony:
+  name: Anthony Fei
+  url: https://www.linkedin.com/in/anthony-fei-11947127b/
+  title: Undergrad Researcher
+  alumni: true
 
-simonguo:
-  name: Simon Guo
-  url: https://simonguo.tech/
-  title: Rotating PhD Student
+buqing:
+  name: Buqing Xu
+  title: MEng Researcher
+  alumni: true
 
-# Collaborating professors
+yifei:
+  name: Yifei Gao
+  title: MEng Researcher
+  alumni: true
 
-percyliang:
-  name: Percy Liang
-  url: https://cs.stanford.edu/~pliang/
-  title: Professor
-  not_current: True
+aditya:
+  name: Aditya Kotha
+  title: Undergrad Researcher
+  alumni: true
+  next: MS at USC
 
-# Alumni
+allan:
+  name: Allan Zhang
+  title: High School Researcher
+  alumni: true
 
-#example:
-#  name: 
-#  url:
-#  title: 
-#  alumni: true
-#  affiliation: 
-#  next:
+julian:
+  name: Julian Bushlow
+  title: Undergrad Researcher
+
+osman:
+  name: EmirOsman Murtazayev
+  title: Undergrad Researcher
+
+
+# visiting researchers
+
+marta:
+  name: Marta Andronic
+  url: https://www.linkedin.com/in/marta-andronic-192190170/?originalSubdomain=uk
+  title: Visiting Researcher
+  alumni: true
+
+ussama:
+  name: Ussama Zahid
+  url: https://www.linkedin.com/in/ussamazahid96/
+  title: Visiting Researcher
+  alumni: true

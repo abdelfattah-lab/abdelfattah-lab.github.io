@@ -1,47 +1,35 @@
-# - key: scalable_intelligence
-#   name: Scalable Intelligence
-#   url: /pubs/#tag=scaling_intelligence
-#   people: azaliamirhoseini, jordanjuravsky, jonsaadfalcon
-#   desc: >
-#     We build new AI systems that scale robustly across data, parameters, compute, and domains.
-# - key: self_improvement
-#   name: Self-Improvement
-#   url: /pubs/#tag=self_improvement
-#   people: azaliamirhoseini, jordanjuravsky, jonsaadfalcon
-#   desc: >
-#     We develop algorithms that enable machines to learn from their own experiences with minimal human guidance.
-# - key: system_design
-#   name: AI for Systems Design 
-#   url: /pubs/#tag=ML_systens
-#   people: azaliamirhoseini, jordanjuravsky, jonsaadfalcon
-#   desc: >
-#     We create AI systems that enable people to design and test new hardware architectures.
-
-
-- key: scalable_intelligence
-  name: Scalable Intelligence
+- key: model_compression
+  name: Deep Neural Network Compression
   url: /pubs/
-  people:
+  people: mohamed, chichih, jordan, jake, rebecca, zhanqiu, allan, aditya
   desc: >
-    We build new AI systems that scale robustly across data, parameters, and compute.
+    We create new compression algorithms to shrink the compute and memory footprint of deep neural networks.
 
-- key: aosi
-  name: Agentic Optimization and Self-Improvement
+- key: systems
+  name: Efficient AI Systems
   url: /pubs/
-  people:
+  people: mohamed, ahmed, chichih, yash, yassine, rahul, yifei, yunhao, anthony
   desc: >
-    We create agentic frameworks that enable machines to learn from their worldly interactions and experiences, enabling advanced reasoning and planning.
+    We analyze and optimize AI systems that host, shard, compress, and deploy large language models.
 
-- key: avb
-  name: Automated Verifiers and Benchmarks
+- key: hardware
+  name: Hardware/software Codesign
   url: /pubs/
-  people:
+  people: mohamed, yuzong, xilai, jake, chunting
   desc: >
-    We design methods and frameworks for automated evaluation and benchmarking.
+    We design new hardware architectures to accelerate efficient AI algorithms.
 
-- key: assa
-  name: AI for Systems and Systems for AI
+#- key: automl
+#  name: Automated Machine Learning
+#  url: /pubs/
+#  people: mohamed, yash, yifei, rahul, yassine
+#  desc: >
+#    We build automated tooling for AI compression to enable hardware-aware, efficient AI deployment.
+
+- key: fpga
+  name: Reconfigurable Computing
   url: /pubs/
-  people:
+  people: xilai, yuzong, junius, buqing, marta, ussama, julian, osman
   desc: >
-    We design efficient systems for AI training and serving, with a particular interest in using AI itself as the optimization engine.
+    We rethink reconfigurable computing architectures for low-latency custom AI computing.
+
