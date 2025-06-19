@@ -4,24 +4,22 @@ layout: page
 ---
 <div id="pubs" class="pure-g">
   <div id="content" class="pure-u-1 pure-u-md-3-4">
-    <h1 class="title">Our Publications</h1>
+    <h1 class="title">Publications</h1>
 
     {% assign pubYears = site.pubs | group_by:"year" | sort: "name" | reverse %}
     {% for year in pubYears %}
 
-        <!-- Our "Selected Prior Publications" are from 2022 and earlier -->
-        {% if year.name == "2022" %}
+        <!-- Our "Selected Prior Publications" are from 2021 and earlier -->
+        <!--{% if year.name == "2021" %}
         <h1 class="title">Selected Prior Publications</h1>
-        {% endif %}
+        {% endif %}-->
 
 
         <div id="year-{{year.name}}" class="year pure-g">
           <div class="pure-u-1-3 pure-u-md-1-5"></div>
-          {% if year.name >= "2024" %}
             <div class="pure-u-2-3 pure-u-md-4-5">
               <h2>{{year.name}}</h2>
             </div>
-          {% endif %}
         </div>
 
 
@@ -66,10 +64,12 @@ layout: page
                   {% if pub.preprint %}Preprint{% else %}Article{% endif %}
                 </a>
               {% else %}
-                <a href="/pubs/{{pub.slug}}.pdf">PDF</a>
+              {% if pub.has_pdf %}
+                <a href="/pubs/{{pub.slug}}.pdf">PDF</a>&middot; 
+              {% endif %}
               {% endif %}
               {% for material in pub.materials %}
-                &middot; <a href="{{material.url}}">{{material.name}}</a>
+                <a href="{{material.url}}">{{material.name}}</a>
               {% endfor %}
             </p>
           </div>
@@ -82,13 +82,13 @@ layout: page
     <h4>Search</h4>
     <input type="text" id="search" placeholder="Search title, abstract, or authors...">
 
-    <h4>Publication Type</h4>
+    <!--<h4>Publication Type</h4>
     <div id="types">
       {% assign types = site.pubs | map: 'type' | uniq %}
       {% for type in types %}
         <a id="type-{{type}}" class="tag" data-tag="{{type}}">{{type | capitalize}} <span>()</span></a>
       {% endfor %}
-    </div>
+    </div>-->
 
     <h4>Tags</h4>
     <div id="tags">

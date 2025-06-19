@@ -76,13 +76,13 @@ layout: page
     <h4>Search</h4>
     <input type="text" id="search" placeholder="Search title or authors...">
 
-    <h4>Blog Type</h4>
+    <!--<h4>Blog Type</h4>
     <div id="types">
       {% assign types = site.blogs | map: 'type' | uniq %}
       {% for type in types %}
         <a id="type-{{type}}" class="tag" data-tag="{{type}}">{{type | capitalize}} <span>()</span></a>
       {% endfor %}
-    </div>
+    </div>-->
 
     <h4>Tags</h4>
     <div id="tags">

@@ -1,14 +1,16 @@
+- # domain
+  - llm
+  - hardware
+  - fpga
+  - ml systems
+  - software
+  - dnn compression
+  - gpu
+  - autoML
 - # contribution type
-  - language
-  - interface
   - system
   - model
   - dataset
   - benchmark
   - empirical study
-- # domain
-  - natural language processing
-  - machine learning
-  - generative ai
-  - ml systems
   
