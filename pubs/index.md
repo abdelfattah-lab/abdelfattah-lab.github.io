@@ -50,7 +50,7 @@ layout: page
               {% if pub.preprint %}
                 {{pub.preprint.server}}: {{pub.preprint.id}}
               {% else %}
-                {{site.data.venues[pub.venue].full}}, {{pub.year}}
+                {{site.data.venues[pub.venue].full}} ({{site.data.venues[pub.venue].short}}), {{pub.year}}
               {% endif %}
             </p>
             {% if pub.award %}

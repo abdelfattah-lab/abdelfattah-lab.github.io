@@ -33,8 +33,16 @@ module Jekyll
       slug = lookup(context, 'page.slug')
       title = lookup(context, 'page.title')
       doi = lookup(context, 'page.doi')
+      pp = lookup(context, 'page.preprint') 
 
       bibtex = venues[venue]['bibtex']
+
+      venue_value =
+        if venue == 'preprint' && pp.is_a?(Hash)
+          "#{pp['server']}:#{pp['id']}"               # e.g.  arxiv:2503.18893
+        else
+          bibtex_escape(venues[venue]['full'])
+        end
 
       author_str = authors.map{|a| a['name'] || people[a['key']]['name']}.join(' and ')
       doi_str = doi ? "\n  doi = {#{doi}}," : ''
@@ -43,7 +51,7 @@ module Jekyll
       "@#{bibtex['type']}{#{year}#{slug.gsub(/[_-]/, '')},
   title = {#{title}},
   author = {#{author_str}},
-  #{bibtex['venue']} = {#{bibtex_escape(venues[venue]['full'])}},
+  #{bibtex['venue']} = {#{venue_value}},
   year = {#{year}},#{doi_str}#{url_str}
 }"
     end

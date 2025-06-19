@@ -3,7 +3,7 @@ preprint:
   full: Preprint
   bibtex:
     type: misc
-    venue: booktitle
+    venue: howpublished
 emnlp:
   short: EMNLP
   full: Conference on Empirical Methods in Natural Language Processing

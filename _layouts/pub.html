@@ -147,7 +147,6 @@
             {% endfor %}
           </ul>
 
-          {% unless page.preprint %}
             <h4>
               Bibtex
               <a id="bib-copy" class="bib" href="#" title="Copy Bibtex"><i class="far fa-copy" aria-hidden="true"></i></a>
@@ -155,7 +154,6 @@
             </h4>
             {% assign bib = site.data.venues[page.venue].bibtex %}
             <pre><code id="bibtex">{% bibtex %}</code></pre>
-          {% endunless %}
 
           {% if page.videos.size > 0 %}
             <h4>Videos</h4>
