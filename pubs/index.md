@@ -27,11 +27,21 @@ layout: page
       {% for pub in pubs %}
         {% assign url = pub.external_url | default: pub.url | relative_url | replace: 'index.html', '' %}
         <div id="{{pub.slug}}" class="pub pure-g" data-pub='{{ pub | jsonify_pub }}'>
+
           <div class="thumbnail pure-u-1-3 pure-u-md-1-5">
-            <a href="{{url}}">
-              <img src="/imgs/thumbs/{{pub.slug}}.png" alt="" />
-            </a>
-          </div>
+          <a href="{{ url }}">
+
+            {%- comment -%}── build the two candidate paths ──{%- endcomment -%}
+            {% assign thumb_src  = "/imgs/thumbs/"  | append: pub.slug | append: ".png" %}
+            {% assign teaser_src = "/imgs/teasers/" | append: pub.slug | append: ".png" %}
+
+            {%- comment -%}── does the thumb really exist? ──{%- endcomment -%}
+            {% assign thumb_file = site.static_files | where: "path", thumb_src | first %}
+
+            <img src="{% if thumb_file %}{{ thumb_src }}{% else %}{{ teaser_src }}{% endif %}" alt="" />
+
+          </a>
+        </div>
 
           <div class="pure-u-2-3 pure-u-md-4-5">
             <h3><a href="{{url}}">{{pub.title}}</a></h3>

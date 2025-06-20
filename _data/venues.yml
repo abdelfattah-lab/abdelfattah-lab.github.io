@@ -96,7 +96,7 @@ iolts:
     venue: booktitle
 heart:
   short: HEART
-  full: International Symposium on Highly-Efficient Accelerators and Reinproceedingsigurable Technologies
+  full: International Symposium on Highly-Efficient Accelerators and Reconfigurable Technologies
   bibtex:
     type: inproceedings
     venue: booktitle
@@ -114,7 +114,7 @@ ispled:
     venue: booktitle
 carl:
   short: CARL
-  full: Workshop on the Intersection of Computer Architecture and Reinproceedingsigurable Logic
+  full: Workshop on the Intersection of Computer Architecture and Reconfigurable Logic
   bibtex:
     type: inproceedings
     venue: booktitle
@@ -168,7 +168,7 @@ hpca:
     venue: booktitle
 trets:
   short: TRETS
-  full: ACM Transactions on Reinproceedingsigurable Technology and Systems
+  full: ACM Transactions on Reconfigurable Technology and Systems
   bibtex:
     type: article
     venue: publisher
