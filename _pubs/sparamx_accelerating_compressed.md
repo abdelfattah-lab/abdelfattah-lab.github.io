@@ -1,7 +1,7 @@
 ---
 title: 'SparAMX: Accelerating Compressed LLMs Token Generation on AMX-powered CPUs'
 authors:
-  - name: Ahmed F. AbouElhamayed
+  - key: ahmed
   - key: jordan
   - key: yash
   - key: chichih

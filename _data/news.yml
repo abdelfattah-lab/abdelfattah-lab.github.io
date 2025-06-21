@@ -4,27 +4,160 @@
 #    
 #
 #    Apply through [MIT EECS](https://www.eecs.mit.edu/academics/graduate-programs/admission-process/) (deadline: **Dec 15, 2023**). The MIT EECS website lists a number of resources to help with the application process. For instance, consider signing up with [MIT EECS GAAP](https://eecs-gaap.mit.edu/) to receive mentorship about your application from a current MIT EECS PhD student.
-- date: 2024-06-25
+- date: April 2025
   desc: >
-    Example news [with a link](https://link.com/).  
-- date: 2024-06-25
+    :page_facing_up: [Palu](https://arxiv.org/pdf/2407.21118) accepted to
+    [ICLR’25](https://iclr.cc/Conferences/2025)
+    and [BitMoD](https://arxiv.org/pdf/2411.11745) accepted to
+    [HPCA’25](https://hpca-conf.org/2025/).
+
+- date: February 2025
   desc: >
-    Example news [with a link](https://link.com/).  
-- date: 2024-06-25
+    Mohamed gave talks at
+    [Tower Research](https://tower-research.com/) conference on synthetic
+    software, and the [LG AI Seminar](https://www.lgresearch.ai/news/view?seq=426).
+
+- date: November 2024
   desc: >
-    Example news [with a link](https://link.com/).  
-- date: 2024-06-25
+    :page_facing_up: [ShadowLLM](https://arxiv.org/pdf/2406.16635) accepted
+    to [EMNLP’24](https://2024.emnlp.org/)
+    and [BBS](https://arxiv.org/pdf/2409.05227) accepted to
+    [MICRO’24](https://microarch.org/micro57/).
+
+- date: September 2024
   desc: >
-    Example news [with a link](https://link.com/).  
-- date: 2024-06-25
+    :page_facing_up: :tada: [FLIQS](https://arxiv.org/pdf/2308.03290)
+    accepted to [AutoML’24](https://2024.automl.cc/) and won best-paper
+    award!
+    Also, [Kratos](https://arxiv.org/pdf/2407.06033) accepted to
+    [FPL’24](http://asaclab.polito.it/fpl2024/).
+
+- date: August 2024
   desc: >
-    Example news [with a link](https://link.com/).  
-- date: 2024-06-25
+    :page_facing_up:
+    [Students’s t-distributions](https://arxiv.org/pdf/2405.03103),
+    [Generative NAS](https://openreview.net/pdf?id=VdZfEMuoj2),
+    and [NAS Encodings](https://arxiv.org/pdf/2403.02484)
+    accepted to [ICML’24](https://icml.cc/Conferences/2024).
+
+- date: June 2024
   desc: >
-    Example news [with a link](https://link.com/).  
-- date: 2024-06-25
+    :page_facing_up: [Beyond Inference](https://arxiv.org/pdf/2403.12981.pdf)
+    accepted to [DAC’24](https://www.dac.com/)
+    and [NAS Latency Predictors](https://arxiv.org/pdf/2403.02446.pdf) accepted
+    to [MLSYS’24](https://mlsys.org/).
+    Also, [PQA](https://arxiv.org/pdf/2305.18334.pdf) accepted to
+    [TRETS](https://dl.acm.org/journal/trets)/[FCCM’24](https://www.fccm.org/).
+
+- date: January 2024
   desc: >
-    Example news [with a link](https://link.com/).  
-- date: 2024-06-25
+    :fire: Mohamed received the
+    [NSF CAREER Award](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2339084)
+    to co-design efficient LLM hardware, software, and algorithms.
+
+- date: January 2024
   desc: >
-    Example news [with a link](https://link.com/).  
+    Mohamed gave talks at
+    [Qualcomm Research](https://www.qualcomm.com/research),
+    [Yale University](https://www.yale.edu/), and
+    [KAUST](https://www.kaust.edu.sa/en/) on efficient machine learning.
+
+- date: October 2023
+  desc: >
+    :page_facing_up: [M4BRAM](https://arxiv.org/pdf/2311.02758.pdf) accepted
+    to [FPT’23](https://fpt2023.org/),
+    and [DiviML](https://arxiv.org/pdf/2308.00127.pdf) accepted
+    to [ICCAD’23](https://iccad.com/).
+
+- date: June 2023
+  desc: >
+    :fire: Our group received an
+    [NSF Award](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2303626) to
+    study fine-grained DNN sparsity.
+
+- date: May 2023
+  desc: >
+    :page_facing_up: [Multi-Predict](https://arxiv.org/pdf/2306.02459.pdf)
+    accepted to [AutoML’23](https://2023.automl.cc/)
+    and [BRAMAC](https://arxiv.org/pdf/2304.03974.pdf) accepted
+    to [FCCM’23](https://www.fccm.org/).
+
+- date: May 2023
+  desc: >
+    Mohamed participated in a
+    [panel](https://twitter.com/mohsaied/status/1656719597574447104) titled
+    “Efficient Scaling of LLMs” at
+    [FCCM’23](https://www.fccm.org/panel-2023/).
+
+- date: February 2023
+  desc: >
+    :page_facing_up:
+    [Zero-Cost Operation Scoring](https://arxiv.org/pdf/2106.06799.pdf)
+    accepted to [AAAI](https://aaai.org/conference/aaai/)
+    and our extended work on
+    [Logic Shrinkage](/assets/pdf/trets23.pdf) has been accepted to
+    [TRETS](https://dl.acm.org/journal/trets).
+
+- date: December 2022
+  desc: >
+    Mohamed gave talks at
+    [Zewail UST](https://www.zewailcity.edu.eg/main/index.php?lang=en),
+    [Rutgers Efficient AI Seminar](https://www.youtube.com/watch?v=OnqnE4KrbSA),
+    [Untether AI](https://www.untether.ai/), and the
+    [FAI Summit](https://www.fai.institute/summit).
+
+- date: October 2022
+  desc: >
+    :page_facing_up: 
+    [Adaptable Butterfly Accelerator](https://arxiv.org/pdf/2209.09570.pdf)
+    accepted to [MICRO’22](https://www.microarch.org/micro55/)
+    and [BLOX](https://arxiv.org/pdf/2210.07271.pdf) accepted
+    to [NeurIPS’22 D&B Track](https://neurips.cc/).
+
+- date: October 2022
+  desc: >
+    :fire: Our group received an
+    [Intel grant](https://www.intel.com/content/www/us/en/research/overview.html)
+    to study hardware-accelerated DNN inference.
+
+- date: September 2022
+  desc: >
+    Mohamed gave a
+    [keynote](https://nicsefc.ee.tsinghua.edu.cn/detail.html?id=1030) at the
+    International Symposium for Applied Reconfigurable Computing, 
+    and a [talk](https://www.youtube.com/watch?v=Ij7oqAwLPOk) at the AutoML
+    seminar.
+
+- date: August 2022
+  desc: >
+    :fire: Our group received a
+    [Meta Research Award](https://research.facebook.com/research-award-recipients/?s)
+    in Networking for AI.
+
+- date: April 2022
+  desc: >
+    Mohamed gave a
+    [talk](https://www.youtube.com/watch?v=WWCWsub3YkE) at the Crossroads
+    FPGA seminar.
+
+- date: March 2022
+  desc: >
+    :fire: We received a
+    [TCS Research Award](https://www.tcs.com/what-we-do/pace-innovation/pace-port/tcs-pace-port-new-york)
+    to study heterogeneous DNN computing.
+
+- date: January 2022
+  desc: >
+    :page_facing_up: :tada:
+    [Logic Shrinkage paper](https://arxiv.org/pdf/2112.02346.pdf) accepted
+    to [FPGA’22](https://www.isfpga.org/) and nominated for best-paper
+    award!
+
+- date: January 2022
+  desc: >
+    Mohamed and Jordan joined the
+    [International Centre for Spatial Computational Learning](https://spatialml.net/).
+
+- date: January 2022
+  desc: >
+    :sparkles: The Abdelfattah Research Group is formed at Cornell University, in the NYC Cornell Tech campus.

@@ -2,7 +2,7 @@
 title: 'BitMoD: Bit-serial Mixture-of-Datatype LLM Acceleration'
 authors:
   - key: yuzong
-  - name: Ahmed F. AbouElhamayed
+  - key: ahmed
   - key: xilai
   - name: Yang Wang
   - key: marta

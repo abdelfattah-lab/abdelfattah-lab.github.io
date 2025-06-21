@@ -1,7 +1,7 @@
 ---
 title: 'PQA: Exploring the Potential of Product Quantization in DNN Hardware Acceleration'
 authors:
-  - name: Ahmed F. AbouElhamayed
+  - key: ahmed
   - name: Angela Cui
   - name: Javier Fernandez-Marques
   - name: Nicholas D. Lane

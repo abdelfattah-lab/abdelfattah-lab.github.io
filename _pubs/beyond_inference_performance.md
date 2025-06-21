@@ -1,7 +1,7 @@
 ---
 title: 'Beyond Inference: Performance Analysis of DNN Server Overheads for Computer Vision'
 authors:
-  - name: Ahmed F. AbouElhamayed
+  - key: ahmed
   - name: Susanne Balle
   - name: Deshanand Singh
   - key: mohamed

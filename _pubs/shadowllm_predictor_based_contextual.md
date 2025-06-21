@@ -2,7 +2,7 @@
 title: 'ShadowLLM: Predictor-based Contextual Sparsity for Large Language Models'
 authors:
   - key: yash
-  - name: Ahmed F. AbouElhamayed
+  - key: ahmed
   - key: jordan
   - name: Zhiru Zhang
   - name: Alexander M. Rush

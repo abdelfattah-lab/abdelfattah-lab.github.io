@@ -15,7 +15,7 @@ home: true
   <div id="news">
       <div id="news-items">
         {% assign unpinned = site.data.news | where_exp: "item", "item.date" %}
-        {% for item in unpinned limit: 10 %}
+        {% for item in unpinned limit: 200 %}
           <div class="item">
             <p class="date">{{item.date}}</p>
             {{item.desc | markdownify}}
@@ -38,6 +38,51 @@ home: true
           </div>
       </div>
     {% endfor %}
+
+  <!-- --- Sponsors pane ---------------------------------------------------- -->
+  <details id="sponsors-pane">
+    <!-- ▸ arrow rotates open/closed via CSS -->
+    <summary>
+      <span class="toggle-arrow">▸</span>
+      Our research is generously supported by amazing collaborators and sponsors, listed here.
+    </summary>
+
+    <!-- Logos grid — manual list with per-logo width -------------------------------->
+    <div class="sponsor-logos pure-g">
+      <div class="logo-cell pure-u-1-2 pure-u-sm-1-3 pure-u-md-1-4">
+        <img src="/imgs/sponsors/nsf.png"     alt="NSF"     width="120">
+      </div>
+      <div class="logo-cell pure-u-1-2 pure-u-sm-1-3 pure-u-md-1-4">
+        <img src="/imgs/sponsors/intel.png"   alt="Intel"   width="100">
+      </div>
+      <div class="logo-cell pure-u-1-2 pure-u-sm-1-3 pure-u-md-1-4">
+        <img src="/imgs/sponsors/altera.png"  alt="Altera"  width="95">
+      </div>
+      <div class="logo-cell pure-u-1-2 pure-u-sm-1-3 pure-u-md-1-4">
+        <img src="/imgs/sponsors/lg.png"      alt="LG"      width="85">
+      </div>
+      <div class="logo-cell pure-u-1-2 pure-u-sm-1-3 pure-u-md-1-4">
+        <img src="/imgs/sponsors/meta.png"    alt="Meta"    width="95">
+      </div>
+      <div class="logo-cell pure-u-1-2 pure-u-sm-1-3 pure-u-md-1-4">
+        <img src="/imgs/sponsors/nvidia.png"  alt="NVIDIA"  width="105">
+      </div>
+      <div class="logo-cell pure-u-1-2 pure-u-sm-1-3 pure-u-md-1-4">
+        <img src="/imgs/sponsors/tcs.png"     alt="TCS"     width="90">
+      </div>
+      <div class="logo-cell pure-u-1-2 pure-u-sm-1-3 pure-u-md-1-4">
+        <img src="/imgs/sponsors/xilinx.svg"     alt="Xilinx"     width="90">
+      </div>
+    </div>
+
+    <!--  Explanatory text --------------------------------------------------- -->
+    <div class="sponsor-text">
+      <p>
+        <!-- -->
+      </p>
+    </div>
+  </details>
+  <!-- --- end Sponsors pane ----------------------------------------------- -->
   </div>
 
   <div class="pure-u-1 pure-u-md-2-5">
@@ -72,7 +117,7 @@ home: true
                 {{person[1].title}}
                 {% if person[1].next %}
                   <br>
-                  &rdca; {{person[1].next}}
+                  ⤷ {{person[1].next}}
                 {% endif %}
               </span>              
             </span>

@@ -2,7 +2,7 @@
 title: 'Attamba: Attending To Multi-Token States'
 authors:
   - key: yash
-  - name: Ahmed F. AbouElhamayed
+  - key: ahmed
   - key: yifei
   - key: chichih
   - name: Nilesh Jain

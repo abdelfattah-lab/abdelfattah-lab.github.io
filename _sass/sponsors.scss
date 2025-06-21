@@ -1,0 +1,50 @@
+/* ───────── Sponsors pane ─────────────────────────────────────────────── */
+#sponsors-pane {
+  margin: 2rem 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  background: #fafafa;
+  max-width: 32.6rem;        /* ≈ 640 px  – pick any value you like            */
+}
+
+/*  Arrow behaviour */
+#sponsors-pane summary {
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 300;
+  list-style: none;      /* remove default arrow */
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.toggle-arrow {
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease-in-out;
+}
+#sponsors-pane[open] .toggle-arrow {
+  transform: rotate(90deg);
+}
+
+/*  Logos grid cells */
+.logo-cell {
+  display: flex;           /* enables flexbox */
+  justify-content: center; /* horizontal centring */
+  align-items: center;     /* vertical   centring */
+  padding: 0.75rem;        /* keep your existing spacing */
+}
+.logo-cell img {
+  width: 100%;
+  max-width: 120px;      /* cap size for uniformity */
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(10%); /* subtle consistency; remove if undesired */
+}
+
+/*  Optional: subtle separation above explanatory paragraph */
+.sponsor-text {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}

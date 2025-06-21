@@ -1,6 +1,12 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    activesupport (6.0.6.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+      zeitwerk (~> 2.2, >= 2.2.2)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     bibtex-ruby (4.4.7)
@@ -26,6 +32,10 @@ GEM
     ffi (1.17.0-x86_64-darwin)
     ffi (1.17.0-x86_64-linux-gnu)
     forwardable-extended (2.6.0)
+    gemoji (4.1.0)
+    html-pipeline (2.14.3)
+      activesupport (>= 2)
+      nokogiri (>= 1.4)
     htmlbeautifier (1.4.2)
     http_parser.rb (0.8.0)
     i18n (1.14.5)
@@ -60,6 +70,10 @@ GEM
       jekyll (>= 3.7, < 5.0)
     jekyll-watch (2.2.1)
       listen (~> 3.0)
+    jemoji (0.13.0)
+      gemoji (>= 3, < 5)
+      html-pipeline (~> 2.2)
+      jekyll (>= 3.0, < 5.0)
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)
@@ -71,6 +85,7 @@ GEM
       rb-inotify (~> 0.9, >= 0.9.10)
     logger (1.6.5)
     mercenary (0.4.0)
+    minitest (5.25.5)
     namae (1.1.1)
     nokogiri (1.18.2-arm64-darwin)
       racc (~> 1.4)
@@ -102,6 +117,7 @@ GEM
     unicode-display_width (1.8.0)
     wdm (0.1.1)
     webrick (1.8.1)
+    zeitwerk (2.7.3)
 
 PLATFORMS
   arm64-darwin
@@ -122,6 +138,7 @@ DEPENDENCIES
   jekyll-scholar
   jekyll-seo-tag
   jekyll-sitemap
+  jemoji
   logger
   nokogiri (~> 1.16)
   tzinfo (~> 1.2)

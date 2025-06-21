@@ -1,5 +1,5 @@
 ---
-title: 'Real-time Streaming Depth Estimation at 2K Resolution'
+title: 'FlashDepth: Real-time Streaming Depth Estimation at 2K Resolution'
 authors:
   - name: Gene Chou
   - name: Wenqi Xian
@@ -11,7 +11,7 @@ authors:
   - name: Paul Debevec
 venue: preprint
 year: 2025
-date: 2025-10-01
+date: 2025-04-01
 teaser: ''
 tags:
   - machine learning
