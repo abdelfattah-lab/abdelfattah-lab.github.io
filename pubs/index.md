@@ -75,10 +75,11 @@ layout: page
                 </a>
               {% else %}
               {% if pub.has_pdf %}
-                <a href="/pubs/{{pub.slug}}.pdf">PDF</a>&middot; 
+                <a href="/pubs/{{pub.slug}}.pdf">PDF</a> · 
               {% endif %}
               {% endif %}
               {% for material in pub.materials %}
+                {% unless forloop.first %}· {% endunless %}
                 <a href="{{material.url}}">{{material.name}}</a>
               {% endfor %}
             </p>

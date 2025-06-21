@@ -18,6 +18,9 @@ materials:
   - name: PDF
     url: https://arxiv.org/pdf/2501.04052
     type: file-pdf
+  - name: Code
+    url: https://github.com/abdelfattah-lab/RaZeR
+    type: code
 preprint:
     server: arxiv
     id: 2501.04052

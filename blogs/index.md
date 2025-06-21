@@ -60,7 +60,7 @@ layout: page
                 {% if forloop.first %}
                   <a href="{{material.url}}">
                 {% else %}
-                  &middot; <a href="{{material.url}}">
+                  · <a href="{{material.url}}">
                 {% endif %}
                    {{material.name}}
                 </a>

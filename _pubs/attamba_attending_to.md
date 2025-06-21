@@ -19,6 +19,9 @@ materials:
   - name: PDF
     url: https://arxiv.org/pdf/2411.17685
     type: file-pdf
+  - name: Code
+    url: https://github.com/abdelfattah-lab/attamba
+    type: code
 preprint:
     server: arxiv
     id: 2411.17685
