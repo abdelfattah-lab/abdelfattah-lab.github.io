@@ -22,4 +22,4 @@ bundle exec jekyll serve
 
 - Add news by adding a new entry to `_data/news.yml`.
 - Add blogs by adding a markdown file to `_blogs`.
-- Add publications by adding a markdown file to `_pubs`.
+- Add publications by adding a markdown file to `_pubs`, and a teaser image with the same name in `imgs/teasers`. You can also optionally add a thumbnail in `imgs/thumbs`, if empty, the teaser will be used as a thumbnail.
