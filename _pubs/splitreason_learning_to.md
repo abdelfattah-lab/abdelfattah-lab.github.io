@@ -17,7 +17,7 @@ tags:
   - inference-time techniques
 materials:
   - name: PDF
-    url: https://arxiv.org/abs/2504.16379
+    url: https://arxiv.org/pdf/2504.16379
     type: file-pdf
   - name: Code
     url: https://github.com/abdelfattah-lab/SplitReason

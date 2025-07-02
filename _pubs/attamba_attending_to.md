@@ -1,11 +1,8 @@
 ---
 title: 'Attamba: Attending To Multi-Token States'
-authors:
+authors:  
   - key: yash
-  - key: ahmed
-  - key: yifei
-  - key: chichih
-  - name: Nilesh Jain
+  - name: Safeen Huda
   - key: mohamed
 venue: preprint
 year: 2024

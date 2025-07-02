@@ -21,6 +21,9 @@ materials:
   - name: PDF
     url: https://arxiv.org/pdf/2504.07093
     type: file-pdf
+  - name: Code
+    url: https://github.com/Eyeline-Research/FlashDepth
+    type: code
 preprint:
     server: arxiv
     id: 2504.07093

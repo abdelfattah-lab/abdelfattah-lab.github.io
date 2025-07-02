@@ -2,7 +2,10 @@
 title: 'TokenButler: Token Importance is Predictable'
 authors:
   - key: yash
-  - name: Safeen Huda
+  - key: ahmed
+  - key: yifei
+  - key: chichih
+  - name: Nilesh Jain
   - key: mohamed
 venue: preprint
 year: 2025
