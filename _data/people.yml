@@ -140,3 +140,10 @@ ussama:
   title: Visiting Researcher
   alumni: true
   affiliation: KAUST
+
+  # collaborators
+
+nilesh:
+  name: Nilesh Jain
+  collab: true
+  affiliation: Intel

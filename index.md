@@ -89,7 +89,7 @@ home: true
 
     <h2 id="people-header">People</h2>
     <div id="people" class="pure-g">
-      {% assign members = site.data.people | filter_alumni: nil | sort_people: 'Professor, PhD, Visiting, Researcher, Undergraduate Student', false %}
+      {% assign members = site.data.people | filter_alumni: nil | filter_collab: nil | sort_people: 'Professor, PhD, Visiting, Researcher, Undergraduate Student', false %}
       {% for person in members %}
         {% unless person[1].not_current %}
           <div id="{{person[0]}}" class="person pure-u-1-4">
@@ -104,7 +104,7 @@ home: true
     </div>
     <h3 id="alumni-header">Alumni</h3>
     <ul id="alumni" class="pure-g">
-      {% assign alumni = site.data.people | filter_alumni: true | sort_people: 'PhD, Postdoctoral, Scientist' %}
+      {% assign alumni = site.data.people | filter_alumni: true | filter_collab: nil | sort_people: 'PhD, Postdoctoral, Scientist' %}
       {% for person in alumni  %}
         <li id="{{person[0]}}" class="person pure-u-1-2">
           <a href="{{person[1].url}}">

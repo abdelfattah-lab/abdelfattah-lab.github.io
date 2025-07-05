@@ -5,6 +5,10 @@ module MITVisFilters
     input.select{ |key, value| value['alumni'] == flag }
   end
 
+  def filter_collab(input, flag)
+    input.select{ |key, value| value['collab'] == flag }
+  end
+
   def filter_titles(arr, titles, flip=false)
     arr.select{ |key, value|
       title = value['title']

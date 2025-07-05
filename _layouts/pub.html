@@ -79,9 +79,14 @@
             {% for author in page.authors %}
               {% assign person = site.data.people[author.key] %}
               {% assign person_url = author.url | default:person.url %}
+              {% assign img_path = "/imgs/people/" | append: author.key | append: ".jpg" %}
+              {% assign file_match = site.static_files | where: "path", img_path %}
+                {% unless file_match.size > 0 %}
+                  {% assign img_path = "/imgs/people/default.jpg" %}
+                {% endunless %}
               <p class="pure-u-1-2 pure-u-md-1-4">
                 {% if person_url %}<a href="{{person_url}}">{% endif %}
-                {% if person %}<img src="/imgs/people/{{author.key}}.jpg" alt="" />{% endif %}
+                {% if person %}<img src="{{img_path}}" alt="" />{% endif %}
                 <span class="name">{{author.name | default:person.name}}{% if author.equal %}*{% endif %}</span>
                 <span class="affiliation">
                   {% if person %}
