@@ -1,13 +1,13 @@
 ---
 title: 'Adaptable Butterfly Accelerator for Attention-based NNs via Hardware and Algorithm Co-design'
 authors:
-  - name: Hongxiang Fan
-  - name: Thomas Chau
-  - name: Stylianos Venieris
-  - name: Royson Lee
-  - name: Alexandros Kouris
-  - name: Wayne Luk
-  - name: Nicholas D. Lane
+  - key: hongxiang
+  - key: thomas
+  - key: stylianos
+  - key: royson
+  - key: alexandros
+  - key: wayne
+  - key: nicholas
   - key: mohamed
 venue: microconf
 year: 2022

@@ -2,8 +2,8 @@
 title: 'BBS: Bi-directional Bit-level Sparsity for Deep Learning Acceleration'
 authors:
   - key: yuzong
-  - name: Jian Meng
-  - name: Jae-sun Seo
+  - key: jian
+  - key: jaesun
   - key: mohamed
 venue: microconf
 year: 2024

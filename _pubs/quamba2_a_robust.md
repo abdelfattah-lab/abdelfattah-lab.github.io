@@ -1,12 +1,12 @@
 ---
 title: 'Quamba2: A Robust and Scalable Post-training Quantization Framework for Selective State Space Models'
 authors:
-  - name: Hung-Yueh Chiang
+  - key: hungyueh
   - key: chichih
-  - name: Natalia Frumkin
-  - name: Kai-Chiang Wu
+  - key: natalia
+  - key: kaichiang
   - key: mohamed
-  - name: Diana Marculescu
+  - key: diana
 venue: icml
 year: 2025
 date: 2025-07-01

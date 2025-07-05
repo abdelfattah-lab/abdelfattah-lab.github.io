@@ -5,7 +5,7 @@ authors:
   - key: ahmed
   - key: yifei
   - key: chichih
-  - name: Nilesh Jain
+  - key: nilesh
   - key: mohamed
 venue: preprint
 year: 2025

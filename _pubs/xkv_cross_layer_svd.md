@@ -2,11 +2,11 @@
 title: 'xKV: Cross-Layer SVD for KV-Cache Compression'
 authors:
   - key: chichih
-  - name: Chien-Yu Lin
+  - key: chienyu
   - key: yash
-  - name: Wei-Cheng Lin
-  - name: Kai-Chiang Wu
-  - name: Luis Ceze
+  - key: weicheng
+  - key: kaichiang
+  - key: luis
   - key: mohamed
 venue: preprint
 year: 2025

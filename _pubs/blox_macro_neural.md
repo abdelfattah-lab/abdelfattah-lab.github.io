@@ -1,10 +1,10 @@
 ---
 title: 'BLOX: Macro Neural Architecture Search Benchmark and Algorithms'
 authors:
-  - name: Thomas Chau
-  - name: Lukasz Dudziak
-  - name: Hongkai Wen
-  - name: Nicholas D. Lane
+  - key: thomas
+  - key: lukasz
+  - key: hongkai
+  - key: nicholas
   - key: mohamed
 venue: nips
 year: 2022

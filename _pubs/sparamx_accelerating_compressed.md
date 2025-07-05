@@ -5,10 +5,10 @@ authors:
   - key: jordan
   - key: yash
   - key: chichih
-  - name: Sameh Gobriel
-  - name: J. Pablo Muñoz
-  - name: Vui Seng Chua
-  - name: Nilesh Jain
+  - key: sameh
+  - key: j
+  - key: vui
+  - key: nilesh
   - key: mohamed
 venue: preprint
 year: 2025

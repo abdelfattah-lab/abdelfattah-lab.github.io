@@ -2,17 +2,17 @@
 title: 'FLIQS: One-Shot Mixed-Precision Floating-Point and Integer Quantization Search'
 authors:
   - key: jordan
-  - name: Gang Wu
-  - name: Andrew Li
-  - name: Muhammad Umar
-  - name: Yun Ni
+  - key: gang
+  - key: andrew
+  - key: muhammad
+  - key: yun
   - key: mohamed
-  - name: Zhiru Zhang
-  - name: Liqun Cheng
-  - name: Martin G. Dixon
-  - name: Norman P. Jouppi
-  - name: Quoc V. Le
-  - name: Sheng Li
+  - key: zhiru
+  - key: liqun
+  - key: martin
+  - key: norman
+  - key: quoc
+  - key: sheng
 venue: automl
 year: 2024
 date: 2024-09-01

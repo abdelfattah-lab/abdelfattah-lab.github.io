@@ -1,12 +1,12 @@
 ---
 title: 'Towards Neural Architecture Search through Hierarchical Generative Modeling'
 authors:
-  - name: Lichuan Xiang
-  - name: \L ukasz Dudziak
+  - key: lichuan
+  - key: lukasz
   - key: mohamed
-  - name: Abhinav Mehrotra
-  - name: Nicholas D. Lane
-  - name: Hongkai Wen
+  - key: abhinav
+  - key: nicholas
+  - key: hongkai
 venue: icml
 year: 2024
 date: 2024-08-01

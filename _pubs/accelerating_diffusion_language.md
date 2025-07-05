@@ -2,12 +2,12 @@
 title: 'Accelerating Diffusion Language Model Inference via Efficient KV Caching and Guided Diffusion'
 authors:
   - key: zhanqiu
-  - name: Jian Meng
+  - key: jian
   - key: yash
   - key: mohamed
-  - name: Jae-sun Seo
-  - name: Zhiru Zhang
-  - name: Udit Gupta
+  - key: jaesun
+  - key: zhiru
+  - key: udit
 venue: preprint
 year: 2025
 date: 2025-05-01

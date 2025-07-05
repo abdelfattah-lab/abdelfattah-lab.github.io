@@ -4,9 +4,9 @@ authors:
   - key: yash
   - key: ahmed
   - key: jordan
-  - name: Zhiru Zhang
-  - name: Alexander M. Rush
-  - name: Safeen Huda
+  - key: zhiru
+  - key: alexander
+  - key: safeen
   - key: mohamed
 venue: emnlp
 year: 2024

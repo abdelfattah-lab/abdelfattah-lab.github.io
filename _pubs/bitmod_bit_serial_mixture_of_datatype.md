@@ -4,9 +4,9 @@ authors:
   - key: yuzong
   - key: ahmed
   - key: xilai
-  - name: Yang Wang
+  - key: yang
   - key: marta
-  - name: George A. Constantinides
+  - key: george1
   - key: mohamed
 venue: hpca
 year: 2025

@@ -3,12 +3,12 @@ title: 'Learning from Students: Applying t-Distributions to Explore Accurate and
 authors:
   - key: jordan
   - key: yuzong
-  - name: Bahaa Kotb
-  - name: Sushma Prasad
-  - name: Gang Wu
-  - name: Sheng Li
+  - key: bahaa
+  - key: sushma
+  - key: gang
+  - key: sheng
   - key: mohamed
-  - name: Zhiru Zhang
+  - key: zhiru
 venue: icml
 year: 2024
 date: 2024-08-01

@@ -147,3 +147,283 @@ nilesh:
   name: Nilesh Jain
   collab: true
   affiliation: Intel
+gene:
+  name: Gene Chou
+  collab: true
+  affiliation: Cornell
+wenqi:
+  name: Wenqi Xian
+  collab: true
+  affiliation: Netflix
+guandao:
+  name: Guandao Yang
+  collab: true
+  affiliation: Stanford
+bharath:
+  name: Bharath Hariharan
+  collab: true
+  affiliation: Cornell
+noah:
+  name: Noah Snavely
+  collab: true
+  affiliation: Cornell
+ning:
+  name: Ning Yu
+  collab: true
+  affiliation: Netflix
+paul:
+  name: Paul Debevec
+  collab: true
+  affiliation: Netflix
+weicheng:
+  name: Wei-Cheng Lin
+  collab: true
+  affiliation: NYMC
+chienyu:
+  name: Chien-Yu Lin
+  collab: true
+  affiliation: U Washington
+chongyan:
+  name: Chong-Yan Chen
+  collab: true
+  affiliation: NYMC
+yufang:
+  name: Yu-Fang Hu
+  collab: true
+  affiliation: NYMC
+peishuo:
+  name: Pei-Shuo Wang
+  collab: true
+  affiliation: NYMC
+ningchi:
+  name: Ning-Chi Huang
+  collab: true
+  affiliation: NYMC
+luis:
+  name: Luis Ceze
+  collab: true
+  affiliation: U Washington
+kaichiang:
+  name: Kai-Chiang Wu
+  collab: true
+  affiliation: NYMC
+zhiru:
+  name: Zhiru Zhang
+  collab: true
+  affiliation: Cornell
+alexander:
+  name: Alexander M. Rush
+  collab: true
+  affiliation: Cornell
+safeen:
+  name: Safeen Huda
+  collab: true
+  affiliation: Google
+thomas:
+  name: Thomas Chau
+  collab: true
+  affiliation: Samsung
+lukasz:
+  name: Lukasz Dudziak
+  collab: true
+  affiliation: Samsung
+hongkai:
+  name: Hongkai Wen
+  collab: true
+  affiliation: Warwick
+nicholas:
+  name: Nicholas D. Lane
+  collab: true
+  affiliation: Cambridge
+bryan:
+  name: Bryan Lewandowski
+  collab: true
+  affiliation: Google
+chenghsi:
+  name: Cheng-Hsi Lin
+  collab: true
+  affiliation: Google
+adrian:
+  name: Adrian N. Reyes
+  collab: true
+  affiliation: Google
+grant:
+  name: Grant C. Forbes
+  collab: true
+  affiliation: Google
+arissa:
+  name: Arissa Wongpanich
+  collab: true
+  affiliation: Google
+bangding:
+  name: Bangding Yang
+  collab: true
+  affiliation: Google
+sagi:
+  name: Sagi Perel
+  collab: true
+  affiliation: Google
+xingyou:
+  name: Xingyou Song
+  collab: true
+  affiliation: Google
+erwei:
+  name: Erwei Wang
+  collab: true
+  affiliation: Imperial
+georgios:
+  name: Georgios Stavrou
+  collab: true
+  affiliation: Imperial
+peter:
+  name: Peter Cheung
+  collab: true
+  affiliation: Imperial
+george:
+  name: George Constantinides
+  collab: true
+  affiliation: Imperial
+james:
+  name: James Davis
+  collab: true
+  affiliation: Imperial
+lichuan:
+  name: Lichuan Xiang
+  collab: true
+  affiliation: Warwick
+susanne:
+  name: Susanne Balle
+  collab: true
+  affiliation: Intel
+deshanand:
+  name: Deshanand Singh
+  collab: true
+  affiliation: Intel
+yang:
+  name: Yang Wang
+  collab: true
+  affiliation: Microsoft
+george1:
+  name: George A. Constantinides
+  collab: true
+  affiliation: Imperial
+yueying:
+  name: Yueying Li
+  collab: true
+  affiliation: Cornell
+sameh:
+  name: Sameh Gobriel
+  collab: true
+  affiliation: Intel
+j:
+  name: J. Pablo Muñoz
+  collab: true
+  affiliation: Intel
+vui:
+  name: Vui Seng Chua
+  collab: true
+  affiliation: Intel
+nilesh:
+  name: Nilesh Jain
+  collab: true
+  affiliation: Intel
+jian:
+  name: Jian Meng
+  collab: true
+  affiliation: Cornell
+jaesun:
+  name: Jae-sun Seo
+  collab: true
+  affiliation: Cornell
+gang:
+  name: Gang Wu
+  collab: true
+  affiliation: Google
+andrew:
+  name: Andrew Li
+  collab: true
+  affiliation: Google
+muhammad:
+  name: Muhammad Umar
+  collab: true
+  affiliation: Cornell
+yun:
+  name: Yun Ni
+  collab: true
+  affiliation: Google
+liqun:
+  name: Liqun Cheng
+  collab: true
+  affiliation: Google
+martin:
+  name: Martin G. Dixon
+  collab: true
+  affiliation: Google
+norman:
+  name: Norman P. Jouppi
+  collab: true
+  affiliation: Google
+quoc:
+  name: Quoc V. Le
+  collab: true
+  affiliation: Google
+sheng:
+  name: Sheng Li
+  collab: true
+  affiliation: Google
+angela:
+  name: Angela Cui
+  collab: true
+  affiliation: Cornell
+javier:
+  name: Javier Fernandez-Marques
+  collab: true
+  affiliation: Flower
+abhinav:
+  name: Abhinav Mehrotra
+  collab: true
+  affiliation: Samsung
+bahaa:
+  name: Bahaa Kotb
+  collab: true
+  affiliation: Cornell
+sushma:
+  name: Sushma Prasad
+  collab: true
+  affiliation: Google
+hungyueh:
+  name: Hung-Yueh Chiang
+  collab: true
+  affiliation: UT Austin
+natalia:
+  name: Natalia Frumkin
+  collab: true
+  affiliation: UT Austin
+diana:
+  name: Diana Marculescu
+  collab: true
+  affiliation: UT Austin
+udit:
+  name: Udit Gupta
+  collab: true
+  affiliation: Cornell
+hongxiang:
+  name: Hongxiang Fan
+  collab: true
+  affiliation: Samsung
+stylianos:
+  name: Stylianos Venieris
+  collab: true
+  affiliation: Samsung
+royson:
+  name: Royson Lee
+  collab: true
+  affiliation: Samsung
+alexandros:
+  name: Alexandros Kouris
+  collab: true
+  affiliation: Samsung
+wayne:
+  name: Wayne Luk
+  collab: true
+  affiliation: Imperial

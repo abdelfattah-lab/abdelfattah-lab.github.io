@@ -2,7 +2,7 @@
 title: 'Attamba: Attending To Multi-Token States'
 authors:  
   - key: yash
-  - name: Safeen Huda
+  - key: safeen
   - key: mohamed
 venue: preprint
 year: 2024

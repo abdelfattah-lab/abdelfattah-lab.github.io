@@ -5,7 +5,7 @@ authors:
   - key: anthony
   - key: chichih
   - key: ahmed
-  - name: Yueying Li
+  - key: yueying
   - key: mohamed
 venue: preprint
 year: 2025

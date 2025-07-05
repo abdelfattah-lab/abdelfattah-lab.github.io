@@ -1,11 +1,11 @@
 ---
 title: 'Logic Shrinkage: Learned FPGA Netlist Sparsity for Efficient Neural Network Inference'
 authors:
-  - name: Erwei Wang
-  - name: James Davis
-  - name: Georgios Stavrou
-  - name: Peter Cheung
-  - name: George Constantinides
+  - key: erwei
+  - key: james
+  - key: georgios
+  - key: peter
+  - key: george
   - key: mohamed
 venue: fpga
 year: 2022

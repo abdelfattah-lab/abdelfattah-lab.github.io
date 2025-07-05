@@ -2,15 +2,15 @@
 title: 'Performance Prediction for Large Systems via Text-to-Text Regression'
 authors:
   - key: yash
-  - name: Bryan Lewandowski
-  - name: Cheng-Hsi Lin
-  - name: Adrian N. Reyes
-  - name: Grant C. Forbes
-  - name: Arissa Wongpanich
-  - name: Bangding Yang
+  - key: bryan
+  - key: chenghsi
+  - key: adrian
+  - key: grant
+  - key: arissa
+  - key: bangding
   - key: mohamed
-  - name: Sagi Perel
-  - name: Xingyou Song
+  - key: sagi
+  - key: xingyou
 venue: preprint
 year: 2025
 date: 2025-06-01

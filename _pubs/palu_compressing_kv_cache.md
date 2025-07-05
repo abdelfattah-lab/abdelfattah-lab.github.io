@@ -2,15 +2,15 @@
 title: 'Palu: Compressing KV-Cache with Low-Rank Projection'
 authors:
   - key: chichih
-  - name: Wei-Cheng Lin
-  - name: Chien-Yu Lin
-  - name: Chong-Yan Chen
-  - name: Yu-Fang Hu
-  - name: Pei-Shuo Wang
-  - name: Ning-Chi Huang
-  - name: Luis Ceze
+  - key: weicheng
+  - key: chienyu
+  - key: chongyan
+  - key: yufang
+  - key: peishuo
+  - key: ningchi
+  - key: luis
   - key: mohamed
-  - name: Kai-Chiang Wu
+  - key: kaichiang
 venue: iclr
 year: 2025
 date: 2025-04-01

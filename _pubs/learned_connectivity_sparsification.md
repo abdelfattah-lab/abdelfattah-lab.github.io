@@ -1,12 +1,12 @@
 ---
 title: 'Learned Connectivity Sparsification for LUT-based Neural Networks'
 authors:
-  - name: Erwei Wang
-  - name: Georgios Stavrou
-  - name: Peter Cheung
-  - name: George Constantinides
+  - key: erwei
+  - key: georgios
+  - key: peter
+  - key: george
   - key: mohamed
-  - name: James Davis
+  - key: james
 venue: trets
 year: 2023
 date: 2023-03-01

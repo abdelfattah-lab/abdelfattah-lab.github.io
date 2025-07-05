@@ -2,9 +2,9 @@
 title: 'PQA: Exploring the Potential of Product Quantization in DNN Hardware Acceleration'
 authors:
   - key: ahmed
-  - name: Angela Cui
-  - name: Javier Fernandez-Marques
-  - name: Nicholas D. Lane
+  - key: angela
+  - key: javier
+  - key: nicholas
   - key: mohamed
 venue: trets
 year: 2024

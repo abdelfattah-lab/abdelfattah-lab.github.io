@@ -1,12 +1,12 @@
 ---
 title: 'Zero-Cost Operation Scoring in Differentiable Architecture Search'
 authors:
-  - name: Lichuan Xiang
-  - name: Lukasz Dudziak
+  - key: lichuan
+  - key: lukasz
   - key: mohamed
-  - name: Thomas Chau
-  - name: Nicholas D. Lane
-  - name: Hongkai Wen
+  - key: thomas
+  - key: nicholas
+  - key: hongkai
 venue: preprint
 year: 2022
 date: 2022-06-01

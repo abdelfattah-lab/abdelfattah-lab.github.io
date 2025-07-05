@@ -2,8 +2,8 @@
 title: 'Beyond Inference: Performance Analysis of DNN Server Overheads for Computer Vision'
 authors:
   - key: ahmed
-  - name: Susanne Balle
-  - name: Deshanand Singh
+  - key: susanne
+  - key: deshanand
   - key: mohamed
 venue: dac
 year: 2024

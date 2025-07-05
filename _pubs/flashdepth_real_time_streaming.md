@@ -1,14 +1,14 @@
 ---
 title: 'FlashDepth: Real-time Streaming Depth Estimation at 2K Resolution'
 authors:
-  - name: Gene Chou
-  - name: Wenqi Xian
-  - name: Guandao Yang
+  - key: gene
+  - key: wenqi
+  - key: guandao
   - key: mohamed
-  - name: Bharath Hariharan
-  - name: Noah Snavely
-  - name: Ning Yu
-  - name: Paul Debevec
+  - key: bharath
+  - key: noah
+  - key: ning
+  - key: paul
 venue: preprint
 year: 2025
 date: 2025-04-01
