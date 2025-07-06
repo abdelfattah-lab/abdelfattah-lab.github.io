@@ -56,6 +56,14 @@ yassine:
 
 # undergrads / MEng
 
+angela:
+  name: Angela Cui
+  affiliation: Cornell
+  url: https://www.linkedin.com/in/angela-cui-575702214/
+  title: Undergrad Researcher
+  alumni: true
+  next: PhD at Berkeley
+
 junius:
   name: Junius Pun
   url: https://www.linkedin.com/in/juniuspun/
@@ -371,10 +379,6 @@ sheng:
   name: Sheng Li
   collab: true
   affiliation: Google
-angela:
-  name: Angela Cui
-  collab: true
-  affiliation: Cornell
 javier:
   name: Javier Fernandez-Marques
   collab: true

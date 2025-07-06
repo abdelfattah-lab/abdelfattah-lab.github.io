@@ -6,6 +6,8 @@ layout: page
   <div id="content" class="pure-u-1 pure-u-md-3-4">
     <h1 class="title">Blog</h1>
 
+    <br><p class="description">Blogging is a new thing we're trying in our research group to share research ideas and results that are either not a good fit, or too preliminary for traditional peer-reviewed publication. We will often also share opinions, retrospectives, and other random content that could benefit from dissemination and feedback. All our blog posts have a comments section to enable interaction and perhaps even start new collaborations!</p>
+
     {% assign blogYears = site.blogs | group_by:"year" | sort: "date" | reverse %}
     {% for year in blogYears %}
       <div id="year-{{year.name}}" class="year pure-g">
