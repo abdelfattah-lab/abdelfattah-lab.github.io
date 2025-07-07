@@ -14,9 +14,9 @@ year: 2022
 date: 2022-10-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - hardware
+  - fpga
+  - dnn compression
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2209.09570.pdf

@@ -11,9 +11,7 @@ year: 2022
 date: 2022-12-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - automl
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2210.07271.pdf

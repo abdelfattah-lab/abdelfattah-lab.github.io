@@ -8,9 +8,7 @@ year: 2023
 date: 2023-09-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - automl
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2306.02459.pdf

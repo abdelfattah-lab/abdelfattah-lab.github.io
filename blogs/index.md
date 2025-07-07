@@ -94,11 +94,7 @@ layout: page
             <a id="tag-{{tag | replace: ' ', '-'}}" class="tag" data-tag="{{tag}}">
               {% assign words = tag | split: ' ' %}
               {% for word in words %}
-                {% if word == 'human-ai' %}
-                  Human-AI
-                {% else %}
-                  {{word | capitalize}}
-                {% endif %}
+                {{word}}
               {% endfor %}
               <span>()</span>
             </a>

@@ -12,9 +12,8 @@ year: 2022
 date: 2022-02-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - fpga
+  - hardware
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2112.02346.pdf

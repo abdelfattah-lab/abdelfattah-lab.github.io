@@ -12,9 +12,8 @@ year: 2023
 date: 2023-03-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - fpga
+  - hardware
 materials:
   - name: PDF
     url: https://dl.acm.org/doi/pdf/10.1145/3583075

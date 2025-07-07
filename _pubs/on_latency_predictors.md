@@ -8,9 +8,7 @@ year: 2024
 date: 2024-05-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - automl
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2403.02446.pdf

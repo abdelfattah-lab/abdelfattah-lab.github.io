@@ -112,7 +112,7 @@ layout: page
                 {% if word == 'human-ai' %}
                   Human-AI
                 {% else %}
-                  {{word | capitalize}}
+                  {{word}}
                 {% endif %}
               {% endfor %}
               <span>()</span>

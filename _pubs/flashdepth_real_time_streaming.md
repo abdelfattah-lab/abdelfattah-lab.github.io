@@ -14,9 +14,7 @@ year: 2025
 date: 2025-04-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - dnn compression
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2504.07093

@@ -8,9 +8,8 @@ year: 2023
 date: 2023-05-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - fpga
+  - hardware
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2304.03974.pdf

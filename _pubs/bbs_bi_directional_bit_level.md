@@ -10,9 +10,7 @@ year: 2024
 date: 2024-11-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - hardware
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2409.05227

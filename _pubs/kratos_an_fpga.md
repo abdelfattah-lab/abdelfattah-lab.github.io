@@ -9,9 +9,7 @@ year: 2024
 date: 2024-09-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - fpga
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2407.06033

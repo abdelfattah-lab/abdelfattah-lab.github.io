@@ -13,9 +13,8 @@ year: 2024
 date: 2024-11-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - llm
+  - dnn compression
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2406.16635

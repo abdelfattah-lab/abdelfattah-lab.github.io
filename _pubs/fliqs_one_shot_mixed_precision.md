@@ -18,9 +18,8 @@ year: 2024
 date: 2024-09-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - dnn compression
+  - automl
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2308.03290

@@ -2,15 +2,8 @@
   - llm
   - hardware
   - fpga
-  - ml systems
   - software
   - dnn compression
   - gpu
-  - autoML
-- # contribution type
-  - system
-  - model
-  - dataset
-  - benchmark
-  - empirical study
+  - automl
   

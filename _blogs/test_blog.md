@@ -8,9 +8,9 @@ authors:
     url: http://link.com
     affiliation: Somewhere
 tags:
-  - ml systems
-  - gpu programming
-  - generative ai
+  - fpga
+  - llm
+  - dnn compression
 venue: none
 year: 2025
 date: 2025-06-01
