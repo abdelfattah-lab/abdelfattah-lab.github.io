@@ -9,7 +9,7 @@ authors:
   - key: noah
   - key: ning
   - key: paul
-venue: preprint
+venue: iccv
 year: 2025
 date: 2025-04-01
 teaser: ''

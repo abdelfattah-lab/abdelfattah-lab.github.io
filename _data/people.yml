@@ -186,7 +186,7 @@ paul:
 weicheng:
   name: Wei-Cheng Lin
   collab: true
-  affiliation: NYMC
+  affiliation: NYCU
 chienyu:
   name: Chien-Yu Lin
   collab: true
@@ -194,19 +194,19 @@ chienyu:
 chongyan:
   name: Chong-Yan Chen
   collab: true
-  affiliation: NYMC
+  affiliation: NYCU
 yufang:
   name: Yu-Fang Hu
   collab: true
-  affiliation: NYMC
+  affiliation: NYCU
 peishuo:
   name: Pei-Shuo Wang
   collab: true
-  affiliation: NYMC
+  affiliation: NYCU
 ningchi:
   name: Ning-Chi Huang
   collab: true
-  affiliation: NYMC
+  affiliation: NYCU
 luis:
   name: Luis Ceze
   collab: true
@@ -214,7 +214,7 @@ luis:
 kaichiang:
   name: Kai-Chiang Wu
   collab: true
-  affiliation: NYMC
+  affiliation: NYCU
 zhiru:
   name: Zhiru Zhang
   collab: true
@@ -431,3 +431,31 @@ wayne:
   name: Wayne Luk
   collab: true
   affiliation: Imperial
+woojeong:
+  name: Woojeong Kim
+  collab: true
+  affiliation: Cornell
+junxiong:
+  name: Junxiong Wang
+  collab: true
+  affiliation: Together AI
+jing:
+  name: Jing Nathan Yan
+  collab: true
+  affiliation: Cornell
+grace:
+  name: Grace Zgheib
+  collab: true
+  affiliation: Altera
+mahesh:
+  name: Mahesh Iyer
+  collab: true
+  affiliation: Altera
+boutros:
+  name: Andrew Boutros
+  collab: true
+  affiliation: Waterloo
+vaughn:
+  name: Vaughn Betz
+  collab: true
+  affiliation: Toronto

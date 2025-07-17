@@ -15,7 +15,7 @@
 - key: hardware
   name: Hardware/software Codesign
   url: /pubs/
-  people: mohamed, yuzong, xilai, jake, chunting
+  people: mohamed, yuzong, xilai, jake, chunting, angela
   desc: >
     We design new hardware architectures to accelerate efficient AI algorithms.
 
@@ -29,7 +29,7 @@
 - key: fpga
   name: Reconfigurable Computing
   url: /pubs/
-  people: xilai, yuzong, junius, buqing, marta, ussama, julian, osman
+  people: xilai, yuzong, junius, buqing, marta, ussama, julian, osman, angela
   desc: >
     We rethink reconfigurable computing architectures for low-latency custom AI computing.
 
