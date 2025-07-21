@@ -138,12 +138,13 @@ Percentage breakdown:
 | M:K:N       | 1:4096:4096 | 1:16384:4096 | 1:16384:16384 |
 |-------------|-------------|--------------|---------------|
 | mma+dequant | 100%        | 100%         | 100%          |
-| mma         | 60.55%      | 61.01%       | 58.96%        |
-| dequant     | 34.45%      | 37.73%       | 37.69%        |
+| mma         | 60.6%       | 61.0%        | 59.0%         |
+| dequant     | 34.5%       | 37.7%        | 37.7%         |
 
-Note that The percentage does not exactly add up to 100.00% because of small overheads in other parts of the kernel.
+Note that The percentage does not exactly add up to 100% because of small overheads in other parts of the kernel.
 
-
+# Conclusion
+In this post, we profiled three state-of-the-art GPU kernels for quantized LLM inference—AWQ, Marlin, and Flute—to quantify the overhead of dequantization. We found that dequantization accounts for 30-45% of the total energy consumption, despite showing near-ideal speedups in wall time. This highlights a hidden cost in quantized inference that needs to be addressed for more energy-efficient deployment. Future work could explore hardware support for quantized operations, or more efficient dequantization algorithms that reduce the overhead without sacrificing performance.
 
 
 # Citing
