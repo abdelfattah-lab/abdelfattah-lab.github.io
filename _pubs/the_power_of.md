@@ -14,6 +14,7 @@ tags:
   - dnn compression
   - llm
   - gpu
+  - quantization
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2501.04052

@@ -13,6 +13,7 @@ teaser: ''
 tags:
   - fpga
   - hardware
+  - quantization
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2305.18334

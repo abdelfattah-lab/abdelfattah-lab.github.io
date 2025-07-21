@@ -131,19 +131,14 @@
 
           <hr>
 
-          {% unless page.stub %}
-            {{content}}
-          {% else %}
-            {% if page.teaser %}
-              <div class="teaser">
-                <img src="/imgs/teasers/{{page.slug}}.png" alt="" />
-                {{page.teaser | markdownify}}
-              </div>
-            {% endif %}
+          {% if page.teaser %}
+            <div class="teaser">
+              <img src="/imgs/teasers/{{page.slug}}.png" alt="" />
+              {{page.teaser | markdownify}}
+            </div>
+          {% endif %}
 
-            {{content}}
-
-          {% endunless %}
+          {{content}}
         </div>
 
         <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
