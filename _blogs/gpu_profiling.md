@@ -12,6 +12,7 @@ venue: none
 year: 2025
 date: 2025-06-01
 teaser: Quantization makes inference faster and lighter in memory, but not "free" in energy.
+stub: false
 materials:
   - name: AWQ
     url: https://github.com/mit-han-lab/llm-awq
@@ -24,8 +25,6 @@ materials:
     type: code
 ---
 
-<!-- <img src="/imgs/blog/test_blog/test_pic.png" width="300" /> -->
-
 # Intro
 
 As large language models (LLMs) see ever-wider deployment, inference efficiency has become critical. Quantization reduces memory footprint and can boost throughput, but it incurs a hidden cost: **dequantization**. On GPUs (and many NPUs), dequantization is often masked by memory-bound GEMV stages, so wall-time measurements may overlook it. In reality, each dequantization step invokes floating-point or vector operations on CUDA cores (or NPU vector arrays), consuming both cycles and energy. Prior work has largely focused on end-to-end latency of quantized GEMM, with little attention to the dequantization overhead that actually drives power draw. In this post, we profile three state-of-the-art kernels—AWQ, Marlin and Flute—to quantify how much time, instruction count, and energy consumption of dequantization on a modern GPU.
@@ -33,28 +32,28 @@ As large language models (LLMs) see ever-wider deployment, inference efficiency 
 
 # Profiling Setup
 
-- **Kernels under test**  
+## Kernels under test
   We pick three typical GPU kernels that are high optimized and widely used in LLM inference: Marlin, AWQ(TinyChat), and Flute. involving typical Integer dequantization, and look-up table (LUT) based dequantization. The conceptual dequantization operations are show below:
   1. **Marlin:** &nbsp;&nbsp; $W = s \times x$
   2. **AWQ (TinyChat):** &nbsp;&nbsp; $W = s \times x + z$
   3. **Flute:** &nbsp;&nbsp; $W = \mathrm{LUT}[x]$  
   where $x\in\{0,1,\dots,15\}$ is a 4-bit integer, $s,z$ are FP16 scalars, and LUT is a 16-entry FP16 look-up table.
 
-- **Hardware**  
+## Hardware 
   - NVIDIA A100 (Ampere architecture, which is the target platform for all three kernels above)
   - 108 SMs × (64 CUDA cores + 4 Tensor cores each)  
   - Mixed-precision pipeline: dequantize weights to FP16, activation inputs FP16, accumulate in FP32.
   - Manually lock the SM frequency to 1.1 GHz to avoid frequency scaling effects.
 
-- **Roofline model**  
+## Roofline model
   <div style="text-align:center;">
-    <img src="/imgs/blog/gpu_profiling/a100_roofline_zoom.png" width="60%" />
+    <img src="/imgs/blog/gpu_profiling/a100_roofline_zoom.png" width="80%" />
   </div>  
   
   - Peak compute: 260.4 TFLOP/s
   - Peak memory bandwidth: 1383.8 GB/s
 
-- **Measurement methodology**  
+## Measurement methodology
   1. **Throughput & instructions:** NVIDIA Nsight Compute  
   2. **Energy estimate:** NVML power API (`nvmlDeviceGetPowerUsage` × kernel runtime)  
   3. **Overhead isolation:**  
@@ -89,19 +88,19 @@ The flute kernel is hard to separate the specific instruction count as many oper
 Breakdown of kernel results with batch size 1:
 
 <div style="text-align:center;">
-    <img src="/imgs/blog/gpu_profiling/breakdown_BS1.png" width="70%" />
+    <img src="/imgs/blog/gpu_profiling/breakdown_BS1.png" width="80%" />
 </div>  
 
 Breakdown of kernel results with batch size 8:
 <div style="text-align:center;">
-    <img src="/imgs/blog/gpu_profiling/breakdown_BS8.png" width="70%" />
+    <img src="/imgs/blog/gpu_profiling/breakdown_BS8.png" width="80%" />
 </div>
 
 * Time means the average pipeline utilization time of the kernel execution. It does not reflect the actual execution wall time, as GPUs' tensor cores and CUDA cores are independent, and the test case is memory bound.
 
-## Discussion
+# Discussion
 
-### Dequantization overhead
+## Dequantization overhead
 
 According to the data above, we can see that dequantization puts a significant overhead on the instruction count, because data format conversions and scaling involves multiple floating point operations or memory accesses. But using tensor cores, the matrix multiplication (MMA) operations only takes one instruction per tile of tensor.
 
@@ -116,7 +115,7 @@ In addition, **Dequantization absorbs roughly 30 – 45 % of on-core energy**. T
 
 Despite wall-time speed-ups approaching the ideal 4 × (FP16 → INT4 compression), the power meter reveals the hidden cost. In short, **quantization makes inference faster and lighter in memory, but not “free” in energy.** Closing this gap—e.g., via hardware tensor cores or on-the-fly fused pipelines—remains an open opportunity for energy-efficient, edge-class LLM deployment.
 
-### Varying kernel input sizes
+## Varying kernel input sizes
 
 We experimented more with different input matrix sizes, and find that the energy consumption relative percentage is relatively stable. Below is the raw data of profiling on Marlin kernel with different input matrix sizes on power. Notice as Marlin kernel is very optimized and the execution is memory bound, the wall time is almost the same across original kernel vs dequantization/MMA-removed kernels, and the energy consumption is proportional to the power draw.
 
