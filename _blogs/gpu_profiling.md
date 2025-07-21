@@ -130,7 +130,6 @@ Raw power measurements:
 | mma+dequant | 188         | 283          | 332           |
 | mma         | 173         | 257          | 297           |
 | dequant     | 164         | 242          | 279           |
-| others      | 151         | 217          | 248           |
 
 
 Percentage breakdown:
