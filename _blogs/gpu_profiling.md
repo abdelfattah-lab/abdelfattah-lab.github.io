@@ -6,7 +6,6 @@ authors:
 tags:
   - gpu
   - llm
-  - cuda
   - quantization
 venue: none
 year: 2025

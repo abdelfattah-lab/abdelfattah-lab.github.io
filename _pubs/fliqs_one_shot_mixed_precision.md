@@ -20,6 +20,7 @@ teaser: ''
 tags:
   - dnn compression
   - automl
+  - quantization
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2308.03290

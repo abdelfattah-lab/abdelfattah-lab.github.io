@@ -16,6 +16,7 @@ tags:
   - dnn compression
   - llm
   - hardware
+  - quantization
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2411.11745

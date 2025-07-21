@@ -16,6 +16,7 @@ teaser: ''
 tags:
   - dnn compression
   - llm
+  - quantization
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2405.03103
