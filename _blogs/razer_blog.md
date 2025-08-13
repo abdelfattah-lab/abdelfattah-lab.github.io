@@ -79,15 +79,136 @@ To demonstrate the benefits of RaZeR, we implement six weight-only quantization 
 
 The table below shows the perplexity of Wikitext2 and C4 datasets across a range of LLMs, all using the instruction-tuned versions. Adding RaZeR consistently outperforms FP4, MXFP4, and NVFP4.
 
-| Method     | Block Size | Scale Format | Llama-3.1-8B<br>Wiki2 &emsp; C4 | Llama-3.2-3B<br>Wiki2 &emsp; C4 | QWen2.5-3B<br>Wiki2 &emsp; C4 | QWen2.5-7B<br>Wiki2 &ensp; C4 | QWen2.5-14B<br>Wiki2 &emsp; C4 |
-|------------|------------|--------------|--------------------------------|------------------------------------|-----------------------------------|-----------------------------|-------------------------------|
-| FP16       | N/A        | N/A          | &ensp; 7.21 &emsp; 10.38        | &ensp; 11.05 &ensp; 14.48         |  &ensp; 8.56 &emsp; 12.03         |  &ensp; 7.46 &emsp; 10.88   |  &ensp; 5.69 &emsp; 9.38  |     
-| FP4        | 128        | FP16         | &ensp; 7.71 &emsp; 11.15        | &ensp; 11.98 &ensp; 15.53         |  &ensp; 9.27 &emsp; 12.91         |  &ensp; 7.79 &emsp; 11.31   |  &ensp; 6.17 &emsp; 9.72  |
-| FP4-RaZeR  | 128        | FP16         | &ensp; **7.60** &emsp; **10.97**| &ensp; **11.94** &ensp; **15.40** |  &ensp; **9.11** &emsp; **12.71** |  &ensp; **7.79** &emsp; **11.20** |  &ensp; **6.14** &emsp; **9.68**  |
-| MXFP4      | 32         | E8M0         | &ensp; 8.14 &emsp; 11.60        | &ensp; 12.31 &ensp; 16.01         |  &ensp; 9.44 &emsp; 13.09         |  &ensp; 8.48 &emsp; 11.97  |  &ensp; 6.41 &emsp; 9.89  |
-| MXFP4-RaZeR| 32         | E8M0         | &ensp; **7.68** &emsp; **11.01**| &ensp; **11.76** &ensp; **15.31** |  &ensp; **9.14** &emsp; **12.80** |  &ensp; **7.77** &emsp; **11.25** |  &ensp; **6.22** &emsp; **9.70**  |
-| NVFP4      | 16         | E4M3 + FP32  | &ensp; 7.56 &emsp; 10.93        | &ensp; 11.73 &ensp; 15.15         |  &ensp; 9.12 &emsp; 12.60         |  &ensp; 7.73 &emsp; 11.13  |  &ensp; 6.05 &emsp; 9.63  |
-| NVFP4-RaZeR| 16         | E4M3 + FP32  | &ensp; **7.42** &emsp; **10.71**| &ensp; **11.41** &ensp; **14.89** |  &ensp; **8.95** &emsp; **12.45** |  &ensp; **7.67** &emsp; **11.05** |  &ensp; **5.95** &emsp; **9.56**  |
+<table><thead>
+  <tr>
+    <th rowspan="2"> <br>Method </th>
+    <th rowspan="2"> <br>Block Size </th>
+    <th rowspan="2"> <br>Scale Format </th>
+    <th colspan="2">Llama-3.1-8B </th>
+    <th colspan="2">Llama-3.2-3B </th>
+    <th colspan="2">QWen2.5-3B </th>
+    <th colspan="2"> QWen2.5-7B </th>
+    <th colspan="2">QWen2.5-14B </th>
+  </tr>
+  <tr>
+    <th>Wiki2</th>
+    <th>C4</th>
+    <th>Wiki2</th>
+    <th>C4</th>
+    <th>Wiki2</th>
+    <th>C4</th>
+    <th>Wiki2</th>
+    <th>C4</th>
+    <th>Wiki2</th>
+    <th>C4</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td> <br>FP16 </td>
+    <td> <br>N/A </td>
+    <td> <br>N/A </td>
+    <td> <br>7.21 </td>
+    <td> <br>10.38 </td>
+    <td> <br>11.05 </td>
+    <td> <br>14.48 </td>
+    <td> <br>8.56 </td>
+    <td> <br>12.03 </td>
+    <td> <br>7.46 </td>
+    <td> <br>10.88 </td>
+    <td> <br>5.69 </td>
+    <td> <br>9.38 </td>
+  </tr>
+  <tr>
+    <td> <br>FP4 </td>
+    <td> <br>128 </td>
+    <td> <br>FP16 </td>
+    <td> <br>7.71 </td>
+    <td> <br>11.15 </td>
+    <td> <br>11.98 </td>
+    <td> <br>15.53 </td>
+    <td> <br>9.27 </td>
+    <td> <br>12.91 </td>
+    <td> <br>7.79 </td>
+    <td> <br>11.31 </td>
+    <td> <br>6.17 </td>
+    <td> <br>9.72 </td>
+  </tr>
+  <tr>
+    <td> <br>FP4-RaZeR </td>
+    <td> <br>128 </td>
+    <td> <br>FP16 </td>
+    <td> <strong><br>7.60 </strong></td>
+    <td> <strong><br>10.97 </strong></td>
+    <td> <strong><br>11.94 </strong></td>
+    <td> <strong><br>15.40 </strong></td>
+    <td> <strong><br>9.11 </strong></td>
+    <td> <strong><br>12.71 </strong></td>
+    <td> <strong><br>7.79 </strong></td>
+    <td> <strong><br>11.20 </strong></td>
+    <td> <strong><br>6.14 </strong></td>
+    <td> <strong><br>9.68 </strong></td>
+  </tr>
+  <tr>
+    <td> <br>MXFP4 </td>
+    <td> <br>32 </td>
+    <td> <br>E8M0 </td>
+    <td> <br>8.14 </td>
+    <td> <br>11.60 </td>
+    <td> <br>12.31 </td>
+    <td> <br>16.01 </td>
+    <td> <br>9.44 </td>
+    <td> <br>13.09 </td>
+    <td> <br>8.48 </td>
+    <td> <br>11.97 </td>
+    <td> <br>6.41 </td>
+    <td> <br>9.89 </td>
+  </tr>
+  <tr>
+    <td> <br>MXFP4-RaZeR </td>
+    <td> <br>32 </td>
+    <td> <br>E8M0 </td>
+    <td> <strong><br>7.68 </strong></td>
+    <td> <strong><br>11.01 </strong></td>
+    <td> <strong><br>11.76 </strong></td>
+    <td> <strong><br>15.31 </strong></td>
+    <td> <strong><br>9.14 </strong></td>
+    <td> <strong><br>12.80 </strong></td>
+    <td> <strong><br>7.77 </strong></td>
+    <td> <strong><br>11.25 </strong></td>
+    <td> <strong><br>6.22 </strong></td>
+    <td> <strong><br>9.70 </strong></td>
+  </tr>
+  <tr>
+    <td> <br>NVFP4 </td>
+    <td> <br>16 </td>
+    <td> <br>E4M3 + FP32 </td>
+    <td> <br>7.56 </td>
+    <td> <br>10.93 </td>
+    <td> <br>11.73 </td>
+    <td> <br>15.15 </td>
+    <td> <br>9.12 </td>
+    <td> <br>12.60 </td>
+    <td> <br>7.73 </td>
+    <td> <br>11.13 </td>
+    <td> <br>6.05 </td>
+    <td> <br>9.63 </td>
+  </tr>
+  <tr>
+    <td> <br>NVFP4-RaZeR </td>
+    <td> <br>16 </td>
+    <td> <br>E4M3 + FP32 </td>
+    <td> <strong><br>7.42 </strong></td>
+    <td> <strong><br>10.71 </strong></td>
+    <td> <strong><br>11.41 </strong></td>
+    <td> <strong><br>14.89 </strong></td>
+    <td> <strong><br>8.95 </strong></td>
+    <td> <strong><br>12.45 </strong></td>
+    <td> <strong><br>7.67 </strong></td>
+    <td> <strong><br>11.05 </strong></td>
+    <td> <strong><br>5.95 </strong></td>
+    <td> <strong><br>9.56 </strong></td>
+  </tr>
+</tbody></table>
 
 
 # Related Work
