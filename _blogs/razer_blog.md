@@ -77,9 +77,9 @@ In order to integrate RaZeR with MXFP4 and NVFP4, each block of elements can ada
 
 
 # Experiment Results
-To demonstrate the benefits of RaZeR, we implement six weight-only quantization algorithms to evaluate the quantization effects of FP4, MXFP4, NVFP4, FP4-RaZeR, MXFP4-RaZeR, and NVFP4-RaZeR. For RaZeR, we choose four pre-defined SVs: \[±5.0, ±8.0\]. Both FP4 and FP4-RaZeR adopt a block size of 128 with a per-block FP16 scale factor. While MXFP4-RaZeR and NVFP4-RaZeR use the same block size and scaling configuration as MXFP4 and NVFP4, respectively. The code to reproduce our experiments is available [here](https://github.com/abdelfattah-lab/razer-llm). 
+To demonstrate the benefits of RaZeR, we implement six weight-only quantization functions to evaluate the impact of FP4, MXFP4, NVFP4, FP4-RaZeR, MXFP4-RaZeR, and NVFP4-RaZeR. For RaZeR, we choose four pre-defined SVs: \[±5.0, ±8.0\]. Both FP4 and FP4-RaZeR adopt a block size of 128 with a per-block FP16 scale factor. While MXFP4-RaZeR and NVFP4-RaZeR use the same block size and scaling configuration as MXFP4 and NVFP4, respectively. The code to reproduce our experiments is available [here](https://github.com/abdelfattah-lab/razer-llm). 
 
-The table below shows the perplexity of Wikitext2 and C4 datasets across a range of LLMs, all using the instruction-tuned versions. Adding RaZeR consistently outperforms FP4, MXFP4, and NVFP4.
+The table below shows the perplexity of Wikitext2 and C4 datasets across a range of LLMs, all using the instruction-tuned versions. A lower perplexity indicates better model performance. Th results demonstrate that adding RaZeR consistently outperforms FP4, MXFP4, and NVFP4.
 
 <table><thead>
   <tr>
