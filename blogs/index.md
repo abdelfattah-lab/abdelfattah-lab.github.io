@@ -19,7 +19,13 @@ layout: page
 
       {% assign blogs = year.items | sort: 'date' | reverse %}
       {% for blog in blogs %}
-        {% assign url = blog.url | relative_url | replace: 'index.html', '' | default: blog.external_url %}
+        {% if blog.redirect %}
+          {% assign url = blog.redirect %}
+        {% elsif blog.external_url %}
+          {% assign url = blog.external_url %}
+        {% else %}
+          {% assign url = blog.url | relative_url | replace: 'index.html', '' | default: blog.external_url %}
+        {% endif %}
         <div id="{{blog.slug}}" class="blog pure-g" data-blog='{{ blog | jsonify_blog }}'>
           <div class="thumbnail pure-u-1-3 pure-u-md-1-5">
             <a href="{{url}}">
