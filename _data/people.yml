@@ -99,7 +99,6 @@ anthony:
   name: Anthony Fei
   url: https://www.linkedin.com/in/anthony-fei-11947127b/
   title: Undergrad Researcher
-  alumni: true
 
 buqing:
   name: Buqing Xu
@@ -131,6 +130,7 @@ osman:
   name: Emirosman Murtazayev
   title: Undergrad Researcher
   affiliation: CUNY
+  alumni: true
 
 
 # visiting researchers
