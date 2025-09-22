@@ -65,6 +65,11 @@ plugins:
 
 # For latex support
 markdown: kramdown
+# for syntax highlighting (but still doesn't work)
+highlighter: rouge
+kramdown:
+    input: GFM
+    syntax_highlighter: rouge
 
 # Dates are used to sort publications, and we will likely upload
 # publications before their conferences occur.
