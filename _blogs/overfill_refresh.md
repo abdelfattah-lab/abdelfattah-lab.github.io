@@ -619,6 +619,12 @@ MC-variance fires at: [112, 144, 176, 336]
 <img src="/imgs/blog/overfill_refresh/refresh_triggers.png" alt="prefill/decode" width="700"/>  
 
 
+## Conclusion
+
+Refreshing the KV cache makes small decoders behave more like big ones on long generations. Starting from OverFill, a simple **periodic** policy already closes most of the quality gap (e.g., **T=64** improves PPL from **~1.88 → ~1.71** at only **~4%** extra latency). An **entropy-gated** policy reaches the same quality with fewer, better-timed refreshes, and **speculative refresh** keeps Teacher work **constant** (e.g., **k=8–16**) so spikes stay tiny (**~2%** overhead) while maintaining near-periodic quality. Future work can explore uncertainty-aware refresh triggers such as MC Dropout to estimate epistemic uncertainty and trigger refreshes only when model belief is unstable, so we can match or exceed entropy-gated quality under the same refresh budget.
+
+
+
 # Citing
 ```bibtex
 @misc{abdelfattah2025_overfill_blog,
