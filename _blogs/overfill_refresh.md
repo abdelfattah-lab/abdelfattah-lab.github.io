@@ -293,17 +293,17 @@ Now, we test using 50 prompts for long form generation (1000+ tokens) using the 
 * **Teacher:** `meta-llama/Llama-3.2-3B-Instruct`
 * **Student:** `friendshipkim/overfill-Llama-3.2-3B-Instruct-pruned-h0.45-i0.45-a0.0-d0.0`
 * **Prompts:** 50 long-form prompts
-* **Scoring:** teacher-PPL, tail log-prob (last 50 toks under teacher), repetition\@3, character count, TTFT/TPS/total time
+* **Scoring:** PPL, tail log-prob (last 50 toks under teacher), repetition\@3, character count, TTFT/TPS/total time
 
 
 ### Baselines (no refresh)
 
 
-| Policy   | TTFT (s) | TPS (tok/s, decode) | Tokens (N) | **Total (s, normalized)** | End-to-end TPS (N/Total) | Teacher-PPL ↓ | Repeat\@3 ↓ |
+| Policy   | TTFT (s) | TPS (tok/s, decode) | Tokens (N) | **Total (s, normalized)** | End-to-end TPS (N/Total) | PPL ↓ | Repeat\@3 ↓ |
 | -------- | -------: | ------------------: | ---------: | ------------------------: | -----------------------: | ------------: | ----------: |
-| Teacher  |    0.040 |                28.2 |       1200 |                 **42.59** |                    28.17 |          2.30 |       0.032 |
-| OverFill |    0.191 |                28.5 |       1200 |                 **42.30** |                    28.37 |          4.96 |       0.072 |
-| Student  |    0.041 |                29.4 |       1200 |                 **40.86** |                    29.37 |          5.89 |       0.028 |
+| Teacher  |    0.040 |                28.2 |       1200 |                 **42.59** |                    28.17 |          1.64 |       0.032 |
+| OverFill |    0.191 |                28.5 |       1200 |                 **42.30** |                    28.37 |          1.88 |       0.072 |
+| Student  |    0.041 |                29.4 |       1200 |                 **40.86** |                    29.37 |          2.35 |       0.028 |
 
 **Takeaways.**
 
@@ -313,7 +313,7 @@ Now, we test using 50 prompts for long form generation (1000+ tokens) using the 
 
 ### Periodic Refresh on OverFill
 
-|    Refresh $T$ | **Teacher-PPL ↓** | Latency Overhead |
+|    Refresh $T$ | **PPL ↓** | Latency Overhead |
 | -------------: | ----------------: | ---------------: |
 | 0 (No Refresh) |          **1.88** |               0% |
 |            256 |              1.86 |            +0.7% |
@@ -351,7 +351,7 @@ This adds **zero** Teacher overhead until a refresh is actually triggered.
 
 ### Results ($N=1200$ tokens)
 
-| Entropy $\tau$ (bits) | Avg #Refresh | **Teacher-PPL ↓** | Total (s) |  TPS |
+| Entropy $\tau$ (bits) | Avg #Refresh | **PPL ↓** | Total (s) |  TPS |
 | :-------------------: | :----------: | ----------------: | --------: | ---: |
 |        **5.5**        |    **2.5**   |          **1.70** |     35.42 | 28.6 |
 |          6.0          |      2.0     |              2.27 |     35.34 | 28.3 |
