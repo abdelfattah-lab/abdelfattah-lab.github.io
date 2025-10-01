@@ -32,13 +32,17 @@ Generating long, coherent, and high-quality text remains difficult for smaller o
 
 [//]: **Decode:** Generate one token at a time using the KV cache. Each step reads the cached K/V (prompt + past outputs), computes attention only for the new position, and appends the new token's K/V to the cache.
 
+<figure>
 <img src="/imgs/blog/overfill_refresh/prefill_refresh_1.png" alt="prefill/decode" width="650"/>
+  <figcaption>Fig.1 - OverFill Architecture performs full prefill and sparse decoding.</figcaption>
+</figure>
+
 
 The OverFill architecture ([Kim et al. 2025](https://arxiv.org/abs/2508.08446)) exploits the prefill/decode split by running a large Teacher model only for the prefill to build a high-fidelity KV cache over the prompt, then hand that cache to a smaller Student model for the token by token decode. Prefill leverages parallelism to produce a strong initial state while decode runs much more quickly using the Student model. Below we formalize this prefill-decode setup (notation, algorithm).
 
-In this blog, we perform dynamic KV cache refreshes to rebuild a high-fidelity KV cache during decoding. As KV cache refreshes do exert extra compute, we use them only when needed. This helps to realign the Student's state to the Teacher's state and to stabilize long generation for a small and controllable prefill tax. This is illustrated below labeled "re-prefill".
+In this blog, we perform dynamic KV cache refreshes to rebuild a high-fidelity KV cache during decoding. As KV cache refreshes do exert extra compute, we use them only when needed. This helps to realign the Student's state to the Teacher's state and to stabilize long generation for a small and controllable prefill tax. 
 
-<img src="/imgs/blog/overfill_refresh/prefill_refresh_2.png" alt="prefill/decode" width="650"/>
+<!-- <img src="/imgs/blog/overfill_refresh/prefill_refresh_2.png" alt="prefill/decode" width="650"/> -->
 
 We will analyze different methods of KV-cache refresh throughout this blog:
 
@@ -227,7 +231,7 @@ With Student decode throughput $\mathrm{TPS}$ (tokens/s) over $N$ generated toke
 
 $$
 \text{time} \;\approx\; \underbrace{\frac{N}{\mathrm{TPS}}}_{\text{Student decode}}\;+\;
-\underbrace{\sum_{r=1}^{R}\ \text{prefill}_{\mathrm{ms}}\!\big(k_r\big)}_{\text{Teacher spikes (incremental, windowed)}}.
+\underbrace{\sum_{r=1}^{R}\ \text{prefill}_{\mathrm{ms}}\big(k_r\big)}_{\text{Teacher spikes (incremental, windowed)}}.
 $$
 
 * Student decode TPS is unchanged by refresh (same kernels, same per-step work).
@@ -619,7 +623,7 @@ MC-variance fires at: [112, 144, 176, 336]
 <img src="/imgs/blog/overfill_refresh/refresh_triggers.png" alt="prefill/decode" width="700"/>  
 
 
-## Conclusion
+# Conclusion
 
 Refreshing the KV cache makes small decoders behave more like big ones on long generations. Starting from OverFill, a simple **periodic** policy already closes most of the quality gap (e.g., **T=64** improves PPL from **~1.88 → ~1.71** at only **~4%** extra latency). An **entropy-gated** policy reaches the same quality with fewer, better-timed refreshes, and **speculative refresh** keeps Teacher work **constant** (e.g., **k=8–16**) so spikes stay tiny (**~2%** overhead) while maintaining near-periodic quality. Future work can explore uncertainty-aware refresh triggers such as MC Dropout to estimate epistemic uncertainty and trigger refreshes only when model belief is unstable, so we can match or exceed entropy-gated quality under the same refresh budget.
 
