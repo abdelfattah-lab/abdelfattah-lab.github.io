@@ -24,6 +24,9 @@ materials:
   - name: Code
     url: https://github.com/google-deepmind/regress-lm
     type: code
+  - name: Blog
+    url: https://research.google/blog/simulating-large-systems-with-regression-language-models/
+    type: blog
 preprint:
     server: arxiv
     id: 2506.21718
