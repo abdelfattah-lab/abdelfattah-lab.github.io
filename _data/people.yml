@@ -132,6 +132,19 @@ osman:
   affiliation: CUNY
   alumni: true
 
+crystal:
+  name: Crystal Zhou
+  url: https://www.linkedin.com/in/crystal-xyz/
+  title: MEng Researcher
+
+isabella:
+  name: Isabella Qiao
+  url: https://www.linkedin.com/in/xinyi-qiao/
+  title: MEng Researcher
+
+sean:
+  name: Sean Mo
+  title: MEng Researcher
 
 # visiting researchers
 
