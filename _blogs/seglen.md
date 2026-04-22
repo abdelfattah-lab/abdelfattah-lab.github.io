@@ -2,6 +2,7 @@
 title: "Rethinking Prefix Caching for Hybrid LLMs"
 authors:
   - key: isabella
+  - key: crystal
   - key: chichih
   - key: mohamed
 tags:
