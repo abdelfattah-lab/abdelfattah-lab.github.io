@@ -365,7 +365,7 @@ In the end, SegLen shows that a simple heuristic is enough to capture the right 
 ```bibtex
 @misc{abdelfattah2026seglen,
       title={Rethinking Prefix Caching for Hybrid LLMs}, 
-      author={Isabella and Chi-Chih Chang and Mohamed Abdelfattah},
+      author={Isabella Qiao and Crystal Zhou and Chi-Chih Chang and Mohamed Abdelfattah},
       year={2026},
       url={https://abdelfattah-lab.github.io/blog/seglen}, 
 }
