@@ -3,7 +3,7 @@ title: 'UniQL: Unified Quantization and Low-rank Compression for Adaptive Edge L
 authors:
   - key: hungyueh
   - key: chichih
-  - name: Yu-Chen Lu
+  - key: yuchen
   - key: chienyu
   - key: kaichiang
   - key: mohamed
