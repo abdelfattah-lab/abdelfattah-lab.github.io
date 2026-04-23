@@ -25,7 +25,7 @@ Replacing FP32 Householder QR with 16-bit matrix multiplications and Cholesky QR
 
 # 1. Introduction
 
-Large Language Models are increasingly deployed at long context lengths — hundreds of thousands of tokens — creating a severe memory bottleneck. During autoregressive generation, the attention mechanism caches every previously computed Key and Value (KV) state. This **KV-Cache** grows as $\mathcal{O}(L \cdot d \cdot N_\text{layers})$, where $L$ is the sequence length and $d$ the per-head hidden dimension. For a 32-layer model with head dimension 512 at 128k-token context in 16-bit precision, the KV-Cache alone requires tens of gigabytes — often comparable to the model weights themselves.
+Large Language Models are increasingly deployed at long context lengths — hundreds of thousands of tokens — creating a severe memory bottleneck. During autoregressive generation, the attention mechanism caches every previously computed Key and Value (KV) state. This **KV-Cache** grows as $O(L \cdot d \cdot N_\text{layers})$, where $L$ is the sequence length and $d$ the per-head hidden dimension. For a 32-layer model with head dimension 512 at 128k-token context in 16-bit precision, the KV-Cache alone requires tens of gigabytes — often comparable to the model weights themselves.
 
 SVD-based compression addresses this directly. Recent work, **xKV** [5], observes that the dominant singular vectors of KV-Caches are well-aligned *across* adjacent layers. Concatenating the KV-Caches of $G$ adjacent layers and applying one shared SVD extracts a basis common to all of them — achieving up to **8× higher compression** while maintaining accuracy. However, that memory saving comes at a cost: xKV must compute SVD **online** during the prefill phase of every request, and this step becomes a significant and growing fraction of prefill latency.
 
@@ -83,7 +83,7 @@ $$
 \mathbf{X} \;\approx\; A\,\bigl[B_{\ell_1}, \ldots, B_{\ell_G}\bigr], \qquad A \in \mathbb{R}^{L \times k},\;\; B_{\ell_i} \in \mathbb{R}^{k \times d}.
 $$
 
-Each layer's cache is recovered by $X_{\ell_i} \approx A\,B_{\ell_i}$, so one SVD compresses all $G$ layers jointly with total storage $\mathcal{O}(Lk + Gdk)$ in place of $\mathcal{O}(GLd)$. The per-layer baseline is simply $G = 1$; there is no fundamental split between "single-layer" and "cross-layer" SVD, only a choice of $G$.
+Each layer's cache is recovered by $X_{\ell_i} \approx A\,B_{\ell_i}$, so one SVD compresses all $G$ layers jointly with total storage $O(Lk + Gdk)$ in place of $O(GLd)$. The per-layer baseline is simply $G = 1$; there is no fundamental split between "single-layer" and "cross-layer" SVD, only a choice of $G$.
 
 In xKV, SVD is performed **online** after prefill to better capture the changing dynamics of the inputs for accuracy preservation. While applying SVD to the KV-Cache effectively reduces its size, it is not a free lunch: on an RTX A6000, PyTorch's `torch.linalg.svd` (full SVD) alone accounts for **73.4%** of per-sample profiling time — not viable for production.
 
@@ -95,7 +95,7 @@ In xKV, SVD is performed **online** after prefill to better capture the changing
 
 For KV-Cache compression we only need the top-$k$ singular vectors. Full SVD computes all $\min(m, n)$ components — often $10\times$ to $100\times$ more than necessary. One direct intuition for optimizing SVD is therefore to compute only the singular vectors we actually need, which is exactly what Randomized SVD does.
 
-Randomized SVD [1] reduces the dominant cost from $\mathcal{O}(mn^2)$ to $\mathcal{O}(mnk)$ by identifying the $k$-dimensional dominant subspace directly. We benchmark PyTorch's off-the-shelf `torch.svd_lowrank` and observe SVD's share of per-sample profiling time drop from 73.4% to **13.0%**.
+Randomized SVD [1] reduces the dominant cost from $O(mn^2)$ to $O(mnk)$ by identifying the $k$-dimensional dominant subspace directly. We benchmark PyTorch's off-the-shelf `torch.svd_lowrank` and observe SVD's share of per-sample profiling time drop from 73.4% to **13.0%**.
 
 ## 4.2 Algorithm Behind Randomized SVD
 
@@ -136,7 +136,7 @@ U       = Q @ U_
 # truncate to top-k; undo transpose if needed
 ```
 
-Total cost is dominated by the $(2n_\text{iter} + 1)$ multiplications with $A$, each $\mathcal{O}(mn(k+p))$ — a factor of $n/(k+p)$ cheaper than full SVD.
+Total cost is dominated by the $(2n_\text{iter} + 1)$ multiplications with $A$, each $O(mn(k+p))$ — a factor of $n/(k+p)$ cheaper than full SVD.
 
 ## 4.3 Limitations of the Existing Implementation (`torch.svd_lowrank`)
 
