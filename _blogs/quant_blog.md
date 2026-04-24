@@ -1,5 +1,5 @@
 ---
-title: "Quantization for LLM: A HW/SW Co-Design Perspective"
+title: "Quantization for LLMs: A HW/SW Co-Design Perspective"
 authors:
   - key: yuzong
 tags:
