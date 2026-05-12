@@ -6,9 +6,9 @@ authors:
   - key: arissa
   - key: bryan
   - key: mohamed
-venue: preprint
-year: 2025
-date: 2025-10-01
+venue: icml
+year: 2026
+date: 2026-07-01
 teaser: ''
 tags:
   - machine learning
