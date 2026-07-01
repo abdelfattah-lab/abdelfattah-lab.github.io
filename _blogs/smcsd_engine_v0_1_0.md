@@ -1,5 +1,5 @@
 ---
-title: "SMC-SD with SGLang — V1"
+title: "SMC-SD with SGLang — v0.1.0"
 authors:
   - key: chichih
   - key: yahya
@@ -21,9 +21,9 @@ materials:
     type: code
 ---
 
-## 1. Introduction
+# 1. Introduction
 
-Speculative decoding speeds up generation by letting a small draft model guess several tokens ahead and having the large target model check them in one pass. It works well when the draft guesses correctly, but every time the draft is wrong, those tokens are thrown away and the work is wasted. SMC (Sequential Monte Carlo speculative decoding) takes a different approach. Instead of running one sequence and rejecting bad guesses, it runs N sequences in parallel, called particles, that all start from the same prompt. A small draft model proposes tokens and a larger target model scores them, and rather than accepting or rejecting, SMC reweighs the particles by how well the target agrees with the draft. Each round extends every particle by K+1 tokens: K from the draft plus one bonus token sampled from the target. When a few particles end up holding most of the weight, the population is resampled in proportion to those weights, so strong particles are copied and weak ones are dropped to ensure a bounded gap to target distribution.
+Speculative decoding speeds up LLM generation by using a small _draft_ model to guess several tokens and having a large _target_ model check them in one pass. It works well when the draft guesses correctly, but every time the draft is wrong, those tokens are thrown away and the work is wasted. SMC (Sequential Monte Carlo speculative decoding) takes a different approach. Instead of running one sequence and rejecting bad guesses, it runs N sequences in parallel, called particles, that all start from the same prompt. A small draft model proposes tokens and a larger target model scores them, and rather than accepting or rejecting specific tokens, SMC reweighs the particles by how well the target agrees with the draft. Each round extends every particle by K+1 tokens: K from the draft plus one bonus token sampled from the target. When a few particles end up holding most of the weight, the population is resampled in proportion to those weights, so strong particles are copied and weak ones are dropped to ensure a bounded gap to the target distribution.
 
 ```python
 particles = [prompt] * N                  # N particles, same prompt
@@ -35,37 +35,42 @@ while not all_finished(particles):
         particles = resample(particles, w)  # ∝ weight; reset row weights
 ```
 
-Please refer to our [paper](https://arxiv.org/pdf/2604.15672) for more algorithm details and experiments. In the following sections, we describe the core engineering problem and the solutions that let us realize SMC’s potential and reach a 5.2x speedup over autoregressive decoding.
+Please refer to our [paper](https://arxiv.org/pdf/2604.15672) for more details on the algorithm, and for extensive experimentation. In the following sections, we describe the core engineering problem and the solutions when implementing SMC-SD within a high-performance inference server. Our implementation realizes SMC’s potential to reach a 5.2x speedup over autoregressive decoding.
 
-![SMC-SD-Algorithm](/imgs/blog/smc_sd_sglang_v1/f4d08881-b9e4-46c9-b277-6bfa3bb86345.png)
+<figure>
+<img src="/imgs/blog/smc_sd_sglang_v1/f4d08881-b9e4-46c9-b277-6bfa3bb86345.png" alt="SMC-SD-Algorithm" width="800"/>
+  <figcaption>SMC-SD-Algorithm. <em>N particles each draft K tokens. The target scores them all in one pass, then the population is resampled by weight when it degenerates. Each round adds K+1 tokens, and nothing is rejected.</em></figcaption>
+</figure>
 
-SMC-SD-Algorithm. *N particles each draft K tokens. The target scores them all in one pass, then the population is resampled by weight when it degenerates. Each round adds K+1 tokens, and nothing is rejected.*
+<figure>
+<img src="/imgs/blog/smc_sd_sglang_v1/throughput.png" alt="SMC-SD Throughput" width="300" style="display:block; margin:0 auto;"/>
+  <figcaption style="text-align:center;">SMC-SD throughput of serving Llama3.1-70B with Llama3.3-1B as drafts.</figcaption>
+</figure>
 
-![Tputs of serving Llama3.1-70B with Llama3.3-1B as drafts. ](/imgs/blog/smc_sd_sglang_v1/_2026-06-29_-10.06.34.png)
-
-Tputs of serving Llama3.1-70B with Llama3.3-1B as drafts. 
-
-## 2. What’s the main engineering problem for supporting SMC-SD
+# 2. The engineering challenge of supporting SMC-SD
 
 In SMC-SD, a single user request no longer owns an independent decoding sequence. After prefill, a request fans out into $N$ particle sequences that share the same prompt, decode in parallel, carry different weights (*i.e.*, a log-probability difference), and can be resampled into one another. This breaks a common assumption in existing LLM serving systems: a request is usually treated as one active sequence throughout decoding.
 
-![1-Req-Many-Seq](/imgs/blog/smc_sd_sglang_v1/9a4fb5a9-7642-4899-bf8a-7a068a0c726b.png)
+<figure>
+<img src="/imgs/blog/smc_sd_sglang_v1/9a4fb5a9-7642-4899-bf8a-7a068a0c726b.png" alt="1-Req-Many-Seq" width="675"/>
+</figure>
 
 However, this does not mean the entire engine has to be rewritten. Most serving engines (such as SGLang and vLLM) are composed two layers: the **scheduler** and the **worker,** as illustrated below. The scheduler maintains the request lifecycle. It accepts requests, tracks their states, organizes runnable work into batches, prepares device tensors ready for processing, and determines when requests are finished. The worker is the execution layer: given a batch of sequences, it performs one model-forward iteration and returns the decoding outputs, such as logits or sampled tokens. It is not responsible for request lifecycle control.
 
-![What-the-worker-expects](/imgs/blog/smc_sd_sglang_v1/8f5d775d-950d-4b67-8cd9-e8348800fb5a.png)
-
-The Scheduler & Worker Contract
+<figure>
+<img src="/imgs/blog/smc_sd_sglang_v1/8f5d775d-950d-4b67-8cd9-e8348800fb5a.png" alt="What-the-worker-expects" width="675"/>
+  <figcaption>The Scheduler & Worker Contract</figcaption>
+</figure>
 
 This separation is the key observation and rationale for building our SMC-SD engine. Although an SMC-SD request consists of $N$ coupled particles, the worker does not need to know whether two sequences came from different user requests or from two particles in the same SMC group. From the worker’s point of view, they are simply sequences in a flat batch. Group ownership, particle weights, ESS checks, resampling, and finalization are all lifecycle concerns, so they belong in the scheduler.
 
-That clean boundary is the reason we can leave most of SGLang’s worker path alone. The worker can keep using the existing model-forward path, including its model runner, CUDA graph capture, fused kernels, and model-specific optimizations. At execution time, each particle is still just an ordinary sequence row. With that boundary marked, the implementation task becomes much clearer. The new work is mainly concentrated above the worker: we need an SMC-aware scheduler that manages request fan-out, particle groups, resampling, and group-level finalization while still presenting the worker with the same flat sequence batch it already expects. 
+This clean boundary allows us to leave most of SGLang’s worker path alone. The worker can keep using the existing model-forward path, including its model runner, CUDA graph capture, fused kernels, and model-specific optimizations. At execution time, each particle is still just an ordinary sequence row. With that boundary marked, the implementation task becomes much clearer. The new work is mainly concentrated above the worker: we need an SMC-aware scheduler that manages request fan-out, particle groups, resampling, and group-level finalization while still presenting the worker with the same flat sequence batch it already expects. 
 
-## 3. The SMC-SD scheduler design
+# 3. The SMC-SD scheduler design
 
 With this worker-scheduler boundary in place, the rest of the design is scheduler state management. The scheduler has to keep one request as a particle group, store particle state across decode rounds, resample particles in place, and finally collapse the group back into one response.
 
-### 3.1 The lifecycle of a request in the SMC-SD scheduler
+## 3.1 Request lifecycle
 
 In ordinary decoding, a request enters the scheduler as one sequence, keeps decoding as that sequence, and leaves when the sequence finishes. SMC-SD adds one extra transition: after prefill, the request fans out into $N$ particle sequences that must stay tied together until the request is complete.
 
@@ -79,7 +84,10 @@ admit parent sequence
     → choose one final response
 ```
 
-![Overall scheduler lifecycle in SMC-SD](/imgs/blog/smc_sd_sglang_v1/eb08ea5c-e1fb-42c5-bdad-c9d7dbddf6df.png)
+<figure>
+<img src="/imgs/blog/smc_sd_sglang_v1/eb08ea5c-e1fb-42c5-bdad-c9d7dbddf6df.png" alt="Overall scheduler lifecycle in SMC-SD" width="675"/>
+  <figcaption>Overall scheduler lifecycle in SMC-SD</figcaption>
+</figure>
 
 We represent this lifecycle with a `SequenceGroup`. Before fan-out, the group contains only the parent sequence. After fan-out, it owns the $N$ particle sequences cloned from that parent.
 
@@ -95,7 +103,7 @@ The purpose of `SequenceGroup` is to give the scheduler one object for the whole
 
 After that, the request stays group-owned. The particles decode together, resample together, and are finalized together. A single particle may finish early, but the user request is not complete until the group is complete. In the actual SGLang implementation, these sequences are backed by `Req` objects, but the scheduler-level idea is simply: one parent sequence becomes $N$ particle sequences under one group.
 
-### 3.2 `ScheduleBatchSMC`: persistent slots for particle state
+## 3.2 "ScheduleBatchSMC": persistent slots for particle state
 
 The scheduler also has to feed the model worker. In SGLang, the worker-facing object is a `ModelWorkerBatch`; the scheduler does not keep that object as its source of truth. Instead, ordinary decoding maintains a live `ScheduleBatch`, then projects that scheduler state into `ModelWorkerBatch` when the worker is ready.
 
@@ -150,7 +158,7 @@ This creates two views of the same decode state. `ScheduleBatchSMC` is the sched
 
 The bridge between the two views is `active_slots`. The scheduler gathers allocated slot ids into contiguous `ModelWorkerBatch` rows, lets the worker execute, then writes results back into the same persistent slots. In the current implementation, `active_slots` includes every allocated slot, including finished particles, so an individual particle finishing does not change group membership or force the scheduler to rebuild the group.
 
-### 3.3 Decode as gather → worker → write back
+## 3.3 Decode as gather → worker → write back
 
 Once the particle state is stored in persistent slots, every decode round follows the same pattern. The scheduler gathers slot state into a worker batch, the worker runs one SMC-SD model step, and the scheduler writes the result back into the same slots.
 
@@ -161,7 +169,10 @@ persistent slots
     → write results back to the same slots
 ```
 
-![Decode as gather worker write back](/imgs/blog/smc_sd_sglang_v1/9d4f5e7d-8fa2-4759-8073-273616597321.png)
+<figure>
+<img src="/imgs/blog/smc_sd_sglang_v1/9d4f5e7d-8fa2-4759-8073-273616597321.png" alt="Decode as gather worker write back" width="675"/>
+  <figcaption>Decode as gather → worker → write back</figcaption>
+</figure>
 
 The figure shows two request groups inside `ScheduleBatchSMC`. Each request owns a `SequenceGroup`, and each group owns several persistent particle slots. The slot ids are stable within each group, but `active_slots` can gather them in a different order before building the worker batch.
 
@@ -189,7 +200,7 @@ done update      # whether the particle reached EOS or the length limit
 
 The scheduler then writes those updates back into the persistent slots. It appends new tokens, updates the particle weights, stores the token needed for the next round, and marks a particle as done if it finished. After that, the next decode round starts again from `ScheduleBatchSMC`.
 
-### 3.4 Resampling as in-place slot reassignment
+## 3.4 Resampling: In-place slot reassignment
 
 When the particle weights become too uneven, the scheduler resamples: it copies strong particles and drops weak ones so the surviving population reflects the weights. A high-weight particle may be copied into several slots, while a low-weight particle is overwritten.
 
@@ -201,7 +212,10 @@ At the scheduler level, resampling is just a list of copy jobs of the form `dst_
 3 <- 1     # slot 3 takes the particle from slot 1
 ```
 
-![Resampling as in-place slot reassignment](/imgs/blog/smc_sd_sglang_v1/6dc9c70d-21c8-4e22-9770-1b445c337bb5.png)
+<figure>
+<img src="/imgs/blog/smc_sd_sglang_v1/6dc9c70d-21c8-4e22-9770-1b445c337bb5.png" alt="Resampling as in-place slot reassignment" width="675"/>
+  <figcaption>Resampling as in-place slot reassignment</figcaption>
+</figure>
 
 The destination slot keeps its identity and still belongs to the same request group; what changes is only the particle state stored inside it.
 
@@ -209,7 +223,7 @@ For each copy job, the scheduler copies the generated tokens, sequence length, d
 
 So resampling does not rebuild the batch and does not create a new set of requests. It updates particle state inside stable slots.
 
-### 3.5 Finalization: returning one response
+## 3.5 Finalization: Returning one response
 
 Inside the scheduler, one request is still running as $N$ particles, but the serving API has to hand back a single response — so there is one last step before the request can leave. A group is ready to finalize once every particle has stopped, either by reaching the end-of-sequence token or by hitting the maximum length. The scheduler then picks one particle to stand in for the whole group, sampling from the final population so that higher-weight particles are more likely to be chosen.
 
@@ -227,6 +241,16 @@ output = all_token_ids[picked_slot, :finished_len[picked_slot]]
 
 With the output in hand, the request is complete. The scheduler then frees the group’s slots so future requests can reuse them.
 
-## 4. Conclusion
+# 4. Conclusion
 
 SMC-SD breaks the “one request = one sequence” assumption, turning each request into a group of coupled particles that fan out, decode in parallel, and resample into one another. The key insight in this v1 design is that this complexity remains above the worker/scheduler boundary: group ownership, weights, ESS checks, resampling, and finalization all live in the scheduler, so the worker continues to see an ordinary flat batch, and we reuse SGLang’s existing forward path largely unchanged. In the upcoming blog post, we will share more details on lower-level optimizations around the SMC scheduler that we did to squeeze the performance, such as a customized CUDA graph and KV-Cache management tailored for SMC. Stay tuned for more details!
+
+# Citing
+```bibtex
+@misc{chang2026_smcsd_engine_v1,
+      title={SMC-SD with SGLang — v0.1.0}, 
+      author={Chi-Chih Chang and Yahya Emara and Mauricio Barba da Costa and Mohamed Abdelfattah},
+      year={2026},
+      url={https://abdelfattah-lab.github.io/blog/smcsd_engine_v0_1_0}, 
+}
+```
