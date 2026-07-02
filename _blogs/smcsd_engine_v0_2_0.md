@@ -32,9 +32,10 @@ In this blog post, we look back at  our [SMC-SD inference engine](https://arxiv
 
 **Where the performance is still on the table.** SMC-SD's no-rejection rule has a second, *systems* consequence: because no token is ever rejected, the cycle's execution shape (tensor sizes, kernel sequence, control flow) is **fully static and data-independent**, fixed before any token is seen. That matters because the bottleneck at batch size 1 is the orchestration. A cycle is many GPU ops (K draft forwards, a target verify, a sampler, a resampler) glued together by host-side Python, kernel launches, and CPU↔GPU syncs, and we measure the bs=1 cycle running at only ~34.5% of the HBM roofline, i.e. **~65% of the wall-clock is bubble**, not useful weight-streaming. Rejection-based SD can't capture a whole cycle ahead of time because its accepted length is dynamic; SMC-SD's static shape lets us fuse and overlap the bubble away. The rest of this post walks through that stack: **refcounted KV prefix sharing** to make N particles cheap, an **overlapped scheduler** that strips the decode-loop syncs, a **deferred bonus token** that fuses two decode steps into one, and a **full-cycle CUDA graph** (unlocked by a graph-safe Gumbel-max sampler) that collapses the per-step host dispatch into a single launch, increasing our performance on a B200 GPU by 22%.
 
-![SMC-SD performance boost from each optimization with a Llama-8B/Llama-1B target-draft pair on a B200 GPU. Total gain: +380 TPS, +22% over v1.](/imgs/blog/smc_sd_engine_v0_2_0/281098f2-d900-4348-ad7a-655716074a13.png)
-
-SMC-SD performance boost from each optimization with a Llama-8B/Llama-1B target-draft pair on a B200 GPU. Total gain: +380 TPS, +22% over v1.
+<figure>
+<img src="/imgs/blog/smcsd_engine_v0_2_0/281098f2-d900-4348-ad7a-655716074a13.png" alt="SMC-SD performance boost" width="800"/>
+  <figcaption>SMC-SD performance boost from each optimization with a Llama-8B/Llama-1B target-draft pair on a B200 GPU. Total gain: +380 TPS, +22% over v1.</figcaption>
+</figure>
 
 # Efficient Prefix-Sharing via Refcounted KV
 
@@ -93,7 +94,10 @@ Here is a code block showing the hot-path of the V1 engine’s event loop—-the
 
 The timeline for this event loop looks like this:
 
-![Screenshot 2026-06-27 at 8.59.39 PM.png](/imgs/blog/smc_sd_engine_v0_2_0/screenshot_2026-06-27_at_8.59.39_pm.png)
+<figure>
+<img src="/imgs/blog/smcsd_engine_v0_2_0/screenshot_2026-06-27_at_8.59.39_pm.png" alt="V1 scheduler timeline" width="800"/>
+  <figcaption>V1 engine timeline showing idle GPU time between SMC-SD steps.</figcaption>
+</figure>
 
 There are roughly 3 distinct steps here:
 
@@ -107,7 +111,10 @@ There are roughly 3 distinct steps here:
 
 The problem with this event loop is that it leaves a lot of idle GPU time between SMC-SD steps. The GPU sync with the CPU between each SMC-SD step waits for the CPU to schedule the next batch. This observation motivates trying to keep the CPU scheduling work [overlapped with the GPU’s workload](https://www.lmsys.org/blog/2024-12-04-sglang-v0-4/). With overlapped CPU scheduling, our timeline looks like this:
 
-![Screenshot 2026-06-27 at 10.08.43 PM.png](/imgs/blog/smc_sd_engine_v0_2_0/screenshot_2026-06-27_at_10.08.43_pm.png)
+<figure>
+<img src="/imgs/blog/smcsd_engine_v0_2_0/screenshot_2026-06-27_at_10.08.43_pm.png" alt="Overlapped scheduling timeline" width="800"/>
+  <figcaption>Overlapped CPU scheduling timeline with the GPU bubble removed.</figcaption>
+</figure>
 
 The GPU bubble between SMC-SD cycles effectively disappears!
 
@@ -185,7 +192,10 @@ def verify(self, draft_tokens):
 
 For a $K=1,N=64$, Llama-1B/8B configuration on an H100, our profiler timeline looks like this:
 
-![Screenshot 2026-06-27 at 8.09.50 PM.png](/imgs/blog/smc_sd_engine_v0_2_0/screenshot_2026-06-27_at_8.09.50_pm.png)
+<figure>
+<img src="/imgs/blog/smcsd_engine_v0_2_0/screenshot_2026-06-27_at_8.09.50_pm.png" alt="Deferred bonus token profiler timeline" width="675"/>
+  <figcaption>Profiler timeline for a K=1, N=64 Llama-1B/8B configuration on an H100.</figcaption>
+</figure>
 
 Idle GPU time between SMC-SD steps effectively disappears we go from 122 tokens-per-second to 190—-a 59% speed-up!
 
@@ -235,3 +245,13 @@ for s in range(num_steps):                    # all K forwards, captured once
 A nice bonus falls out of this. SMC needs each draft token's log-prob for the importance-weight update, and here it's computed **inline from the same `scaled` tensor** as `chosen − logsumexp(scaled)` , so no separate `log_softmax → exp → gather` pass. The sample and its log-prob share one read of the logits.
 
 Once sampling is in-graph, there's no reason to stop at the draft phase. Because the batch shape is static across the *entire* cycle, we can extend the capture through the `TARGET_VERIFY` forward on the score model, the per-position weight diff (`score_logprob − draft_logprob`), and the Gumbel-max **bonus** draw, which samples from the same tempered-power target `p_T^α` as the per-step draws, so the whole cycle runs off one consistent, capturable sampler. One `replay()` then covers everything the worker does between "batch prepared" and "result tensors ready." The deferred-bonus two-token head from the previous section folds into the same capture.
+
+# Citing
+```bibtex
+@misc{emara2026_smcsd_engine_v2,
+      title={SMC-SD Inference Engine v0.2.0}, 
+      author={Yahya Emara and Mauricio Barba da Costa and Chi-Chih Chang and Mohamed Abdelfattah},
+      year={2026},
+      url={https://abdelfattah-lab.github.io/blog/smcsd_engine_v0_2_0}, 
+}
+```
