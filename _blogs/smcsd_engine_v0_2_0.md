@@ -9,6 +9,7 @@ tags:
   - llm
   - software
   - gpu
+  - specdecode
 venue: none
 year: 2026
 date: 2026-06-30

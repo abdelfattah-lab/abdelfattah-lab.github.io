@@ -13,9 +13,9 @@ year: 2026
 date: 2026-6-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - llm
+  - hardware
+  - quantization
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2511.06838

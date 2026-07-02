@@ -13,9 +13,9 @@ year: 2026
 date: 2026-01-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - llm
+  - quantization
+  - hardware
 materials:
   - name: PDF
     url: https://www.computer.org/csdl/journal/tc/2026/02/11230072/2boU8qTRQnm

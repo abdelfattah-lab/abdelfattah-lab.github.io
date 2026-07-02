@@ -5,6 +5,7 @@ authors:
   - key: mohamed
 tags:
   - llm
+  - specdecode
 venue: none
 year: 2026
 date: 2026-06-01

@@ -13,9 +13,8 @@ year: 2026
 date: 2026-08-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - llm
+  - specdecode
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2604.15672

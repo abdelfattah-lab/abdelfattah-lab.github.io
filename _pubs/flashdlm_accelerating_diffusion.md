@@ -13,9 +13,7 @@ year: 2026
 date: 2026-04-01
 teaser: ''
 tags:
-  - machine learning
-  - generative ai
-  - inference-time techniques
+  - llm
 materials:
   - name: PDF
     url: https://arxiv.org/pdf/2505.21467
