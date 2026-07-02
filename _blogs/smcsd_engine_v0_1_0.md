@@ -1,5 +1,5 @@
 ---
-title: "SMC-SD with SGLang — v0.1.0"
+title: "SMC-SD Inference Engine v0.1.0"
 authors:
   - key: chichih
   - key: yahya
@@ -248,7 +248,7 @@ SMC-SD breaks the “one request = one sequence” assumption, turning each requ
 # Citing
 ```bibtex
 @misc{chang2026_smcsd_engine_v1,
-      title={SMC-SD with SGLang — v0.1.0}, 
+      title={SMC-SD Inference Engine v0.1.0}, 
       author={Chi-Chih Chang and Yahya Emara and Mauricio Barba da Costa and Mohamed Abdelfattah},
       year={2026},
       url={https://abdelfattah-lab.github.io/blog/smcsd_engine_v0_1_0}, 

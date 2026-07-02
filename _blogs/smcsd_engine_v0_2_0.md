@@ -22,22 +22,22 @@ materials:
     type: code
 ---
 
-TL;DR: We present a series of SMC-SD engine-level optimizations: refcounted KV prefix sharing, an overlap scheduler that removes decode-loop DtoH syncs, a deferred bonus token, and full-cycle CUDA graphing with a graph-safe Gumbel-max sampler. Together, this makes our v0.2.0 SMC-SD engine ~22% faster with no change to the algorithm or its outputs.
+**TL;DR**: We present a series of SMC-SD engine-level optimizations: refcounted KV prefix sharing, an overlap scheduler that removes decode-loop DtoH syncs, a deferred bonus token, and full-cycle CUDA graphing with a graph-safe Gumbel-max sampler. Together, this makes our v0.2.0 SMC-SD engine ~22% faster with no change to the algorithm or its outputs.
 
-# Introduction
+# 1. Introduction
 
-In this blog post, we look back at  our [SMC-SD inference engine](https://arxiv.org/abs/2604.15672), which achieved strong performance results relative to existing speculative decoding algorithms, and we discuss new optimizations that make our v0.2.0 engine significantly faster.
+In this blog post, we look back at  our [SMC-SD inference engine](../smcsd-engine-v0-1-0/), which achieved strong performance results relative to existing speculative decoding algorithms, and we discuss new optimizations that make our v0.2.0 engine significantly faster.
 
 **What SMC-SD is, and why it's fast.** Unlike rejection-based speculative decoding (EAGLE, Medusa, DFlash), which keeps only the longest draft prefix the target agrees with, SMC-SD *never rejects*. It runs **N particles** per request; each cycle every particle drafts **K** tokens from the small draft model, the target scores them in a single forward, and instead of truncating we **accept all K tokens and correct via importance reweighting**: each particle accumulates a log-weight `α·log p_target − log q_draft`, particles are resampled across the population, and a bonus token is drawn at the end. So the sequence advances by a guaranteed **K+1 tokens every cycle**, deterministically, while the particle weights (not the accepted length) carry the correction back to the target distribution. This gives SMC-SD a tunable quality/throughput knob (via N and the power-target temperature) and strong accuracy at high token rates; see the paper [[1](https://arxiv.org/abs/2604.15672)] for the algorithm, the estimator, and the accuracy/throughput results against baselines.
 
 **Where the performance is still on the table.** SMC-SD's no-rejection rule has a second, *systems* consequence: because no token is ever rejected, the cycle's execution shape (tensor sizes, kernel sequence, control flow) is **fully static and data-independent**, fixed before any token is seen. That matters because the bottleneck at batch size 1 is the orchestration. A cycle is many GPU ops (K draft forwards, a target verify, a sampler, a resampler) glued together by host-side Python, kernel launches, and CPU↔GPU syncs, and we measure the bs=1 cycle running at only ~34.5% of the HBM roofline, i.e. **~65% of the wall-clock is bubble**, not useful weight-streaming. Rejection-based SD can't capture a whole cycle ahead of time because its accepted length is dynamic; SMC-SD's static shape lets us fuse and overlap the bubble away. The rest of this post walks through that stack: **refcounted KV prefix sharing** to make N particles cheap, an **overlapped scheduler** that strips the decode-loop syncs, a **deferred bonus token** that fuses two decode steps into one, and a **full-cycle CUDA graph** (unlocked by a graph-safe Gumbel-max sampler) that collapses the per-step host dispatch into a single launch, increasing our performance on a B200 GPU by 22%.
 
 <figure>
-<img src="/imgs/blog/smcsd_engine_v0_2_0/281098f2-d900-4348-ad7a-655716074a13.png" alt="SMC-SD performance boost" width="800"/>
-  <figcaption>SMC-SD performance boost from each optimization with a Llama-8B/Llama-1B target-draft pair on a B200 GPU. Total gain: +380 TPS, +22% over v1.</figcaption>
+<img src="/imgs/blog/smcsd_engine_v0_2_0/281098f2-d900-4348-ad7a-655716074a13.png" alt="SMC-SD performance boost" width="400" style="display:block; margin:0 auto;"/>
+  <figcaption  style="text-align:left;"> SMC-SD performance boost from each optimization with a Llama-8B/Llama-1B target-draft pair on a B200 GPU. Total gain: +380 TPS, +22% over v1.</figcaption>
 </figure>
 
-# Efficient Prefix-Sharing via Refcounted KV
+# 2. Efficient Prefix-Sharing via Refcounted KV
 
 When running SMC-SD, each user request fans out into **N particles,** all starting from the same prompt. Two KV caches are used (for both the draft and target models), and each particle needs the prompt's KV prefix in both. The naïve implementation would give each particle its own copy of the prefix, which would cost `Nx` the KV memory. Compounding memory management problems, the `N×` copy bandwidth hurts fan-out and resample latency. 
 
@@ -79,7 +79,7 @@ This makes N-particle SMC affordable: particles share a prefix safely and resamp
 
 **Note:** SGLang already refcounts shared KV as RadixAttention hashes token spans into a radix tree and reference-counts the tree *nodes* so a prefix shared across requests survives until the last user is done with it. But that machinery is the wrong shape for SMC on two counts. First, its refcount API is **per-node and single-node** (`inc_lock_ref(node)` / `dec_lock_ref(node)`), with no way to bump or drop a *batch* of slots at once, yet every SMC decode step duplicates and frees slots across N particles and many groups at once, and has to do so without a host sync (see the overlap scheduler). Second, SGLang only **registers spans into the radix tree at request boundaries,** after prefill finishes, when a request finishes, or on retraction, but never during decoding, which is exactly when SMC's sharing is created and destroyed by fan-out and resampling. So rather than fight the tree-cache API, we add a thin per-slot refcount layer of our own: the base `TokenToKVPoolAllocator` we inherit from SGLang has no refcounts, and we add them.
 
-# Overlapped Scheduling
+# 3. Overlapped Scheduling
 
 Here is a code block showing the hot-path of the V1 engine’s event loop—-the core scheduler loop that fetches requests and dispatches work to the GPU.
 
@@ -118,11 +118,11 @@ The problem with this event loop is that it leaves a lot of idle GPU time betwee
 
 The GPU bubble between SMC-SD cycles effectively disappears!
 
-## Removing CPU-GPU roundtrips Syncs
+## 3.1 Removing CPU-GPU roundtrips Syncs
 
 Before we can fully overlap CPU scheduling with GPU work, we need to remove a key blocking device-to-host (DtoH) sync on the decode hot path. Our resampling step involves (1) drawing random samples to determine which particles are duplicated and which are eliminated and (2) reshuffling KV cache pages given the plan from the previous step. In our V1 engine, the dispatch grid of the kernel that did (2) depended GPU-resident data after completing step (1), forcing a DtoH sync. Crucially, this step also cannot be pushed to the post-processing stage where the CPU work will overlap with the GPU as the next SMC-SD step needs to know which pages are associated to each request in a batch. We this sync by dispatching the KV reshuffle kernel with a loosely upper bounded grid that keeps its shape static, and by always launching the KV reshuffle kernel even when it is a no-op (for instance, when the effective sample size is not below the resampling threshold). The loose upper bound we use for the KV reshuffle kernel leads to considerably more threads being dispatched on the GPU that do wasteful work; the kernel goes from 2us to 5us. Moreover, even when no particles are resampled and no GPU work is needed, we dispatch the KV reshuffle kernel, anyway, to avoid branch logic that would force a DtoH sync. Both of these penalties are considerably less than the cost of moving data between the GPU and CPU and are worth it to keep GPUs brr’ing.
 
-## Overlapped Scheduling Event Loop
+## 3.2 Overlapped Scheduling Event Loop
 
 After removing the blocking DtoH sync between SMC-SD steps, we are left with two non-blocking procedures that run on the CPU:
 
@@ -159,7 +159,7 @@ Once we’ve made these changes, we can implement our overlapped scheduler event
 																					              # copied to host and then processes result
 ```
 
-# Deferred bonus token
+# 4. Deferred bonus token
 
 In our V1 engine, we dealt with the bonus token by running $K+1$ forward passes of the draft model and then replacing the $(K+1)$’th token with the bonus token generated by the target model. We do this so that the draft’s KV cache for the $K$’th token is already computed for the next SMC-SD round. The single uncommitted “frontier token” is then the bonus token.
 
@@ -199,7 +199,7 @@ For a $K=1,N=64$, Llama-1B/8B configuration on an H100, our profiler timeline lo
 
 Idle GPU time between SMC-SD steps effectively disappears we go from 122 tokens-per-second to 190—-a 59% speed-up!
 
-# Cuda-graphing the full cycle
+# 5. Cuda-graphing the full cycle
 
 Per cycle, the draft model runs $K$ autoregressive forward passes. In the straightforward implementation, each of those are its own decode-graph replay, its own `replay_prepare` to write attention metadata, its own kernel launches for the forward and the eager (op-by-op) sampling. The sampled token stays on the GPU and flows straight into the next forward, so there's **no synchronization here** — but every step still costs host time to dispatch. At ~0.74 ms of host dispatch per step, and with the draft model's per-step GPU work being small, the GPU drains its kernel queue faster than the CPU can refill it and ends up **launch-bound** — about 25% idle at batch size 32, waiting on the CPU rather than on a sync.
 
@@ -215,7 +215,7 @@ for s in 0..K:
 
 Interestingly, SMC-SD is an easier case to do this for than normal speculation. The whole thing works because **batch composition is static within a cycle,** the draft loop and the verify pass that follows see the same batch size, particle slots don't move mid-cycle, and the per-step `seq_lens` are just affine in the step index. There's no tree to prune or variable acceptance length to branch on. So the chain of forwards is a fixed shape we can compile into a cuda graph.
 
-## Making the sampler capturable: Gumbel-max
+## 5.1 Making the sampler capturable: Gumbel-max
 
 To capture the draft phase as one graph, the **sampling has to live inside the graph too.** The obvious sampler, `softmax(logits/T)` → `torch.multinomial`, **cannot be captured**: its RNG isn't graph-safe.
 
