@@ -10,7 +10,7 @@ tags:
   - software
 venue: none
 year: 2026
-date: 2026-06-30
+date: 2026-05-30
 stub: false
 materials:
   - name: Paper
