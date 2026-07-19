@@ -192,7 +192,7 @@ def prompt_for_date(name, src_path):
         parsed = parse_month_year(ans)
         if parsed:
             month, year = parsed
-            iso = datetime(year, month, 15, 12, 0, 0).strftime("%Y-%m-%dT%H:%M:%S")
+            iso = datetime(year, month, 1, 12, 0, 0).strftime("%Y-%m-%dT%H:%M:%S")
             log(f"    -> set to {iso[:7]}")
             return iso
         log("    Couldn't read that — try like '03/2024' or 'March 2024'.")
