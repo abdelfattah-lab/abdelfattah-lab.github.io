@@ -257,6 +257,9 @@ def main():
                     help="Reprocess photos even if already published.")
     ap.add_argument("--no-prompt", action="store_true",
                     help="Don't ask for a date on undated photos; leave them undated.")
+    ap.add_argument("--update_deleted", action="store_true",
+                    help="Also remove published photos whose source was deleted "
+                         "from the source folder (off by default).")
     args = ap.parse_args()
 
     if not os.path.isdir(args.src):
@@ -336,6 +339,31 @@ def main():
         added += 1
         log(f"  + {name} -> {out_name}  ({date[:10] or 'undated'})")
 
+    # Optionally prune photos whose source was removed (opt-in: --update_deleted).
+    removed = 0
+    expected = {sanitize(name) for name in sources}
+    published = {f for f in os.listdir(GALLERY_DIR)
+                 if f.lower().endswith(".jpg") and os.path.isfile(os.path.join(GALLERY_DIR, f))}
+    stale = sorted(published - expected)
+    if stale and not args.update_deleted:
+        log(f"  ({len(stale)} published photo(s) no longer in the source folder; "
+            f"pass --update_deleted to remove them)")
+    elif stale and not sources:
+        # Safety: an empty source folder is almost always a mistake, not an
+        # instruction to wipe the whole gallery. Refuse and let the user decide.
+        log(f"  ! source folder has no photos — refusing to prune {len(stale)} "
+            f"published photo(s). Delete imgs/gallery/ manually if you really "
+            f"mean to empty the gallery.")
+    elif stale:
+        for out_name in stale:
+            for path in (os.path.join(GALLERY_DIR, out_name),
+                         os.path.join(THUMBS_DIR, out_name)):
+                if os.path.exists(path):
+                    os.remove(path)
+            manifest.pop(out_name, None)
+            removed += 1
+            log(f"  - removed {out_name} (source deleted)")
+
     # Rebuild the manifest from what actually exists on disk.
     items = []
     for out_name, meta in manifest.items():
@@ -355,7 +383,8 @@ def main():
     items = write_manifest(items)
 
     log("")
-    log(f"Done. {added} added, {dated} newly dated, {skipped} unchanged, {failed} failed.")
+    log(f"Done. {added} added, {dated} newly dated, {removed} removed, "
+        f"{skipped} unchanged, {failed} failed.")
     log(f"Gallery now has {len(items)} photos -> {os.path.relpath(DATA_FILE, ROOT)}")
     return 0
 
