@@ -1,0 +1,138 @@
+/* ── Gallery ─────────────────────────────────────────────────────────── */
+
+#gallery {
+  .title {
+    font-family: $heading-font;
+    margin-bottom: 0.15em;
+  }
+
+  .gallery-intro {
+    color: $csail-lgrey;
+    margin-top: 0;
+    margin-bottom: 1.5em;
+  }
+
+  .gallery-empty {
+    color: $csail-lgrey;
+  }
+}
+
+/* Minimalist square grid. */
+#photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+
+  @include for-md-down {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 6px;
+  }
+
+  .tile {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #f2f2f2;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.35s ease, filter 0.35s ease;
+    }
+
+    &:hover img,
+    &:focus img {
+      transform: scale(1.06);
+      filter: brightness(1.05);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $csail-orange;
+      outline-offset: 2px;
+    }
+  }
+}
+
+/* ── Lightbox ────────────────────────────────────────────────────────── */
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 15, 15, 0.94);
+  align-items: center;
+  justify-content: center;
+
+  &.open { display: flex; }
+
+  .lb-stage {
+    margin: 0;
+    max-width: 92vw;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lb-img {
+    max-width: 92vw;
+    max-height: 84vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .lb-caption {
+    color: #e8e8e8;
+    font-size: 0.9rem;
+    margin-top: 12px;
+    text-align: center;
+    min-height: 1.2em;
+  }
+
+  /* Controls */
+  .lb-close,
+  .lb-nav {
+    position: absolute;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+    line-height: 1;
+
+    &:hover { opacity: 1; }
+  }
+
+  .lb-close {
+    top: 16px;
+    right: 22px;
+    font-size: 2.6rem;
+  }
+
+  .lb-nav {
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3.2rem;
+    padding: 0 18px;
+  }
+
+  .lb-prev { left: 6px; }
+  .lb-next { right: 6px; }
+
+  @include for-md-down {
+    .lb-nav { font-size: 2.4rem; padding: 0 8px; }
+    .lb-close { font-size: 2.2rem; top: 10px; right: 14px; }
+    .lb-img { max-height: 78vh; }
+  }
+}
