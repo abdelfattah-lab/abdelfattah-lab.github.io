@@ -14,7 +14,8 @@ jordan:
   name: Jordan Dotzel
   url: https://www.linkedin.com/in/dotzel/
   title: PhD Student
-  next: Google Research
+  alumni: true
+  next: Google
 
 ahmed:
   name: Ahmed Fathy
@@ -123,6 +124,7 @@ yifei:
   name: Yifei Gao
   title: MEng Researcher
   alumni: true
+  next: Fireworks
 
 aditya:
   name: Aditya Kotha
