@@ -85,6 +85,7 @@ future: true
 # their entries' file path in the `include:` list.
 #
 exclude:
+  - temp/
   - .sass-cache/
   - .jekyll-cache/
   - gemfiles/

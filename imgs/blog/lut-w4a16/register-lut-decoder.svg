@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="784.944pt" height="475.056pt" viewBox="0 0 784.944 475.056" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-23T20:10:58.236131</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 475.056 
+L 784.944 475.056 
+L 784.944 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 30.646944 152.278272 
+L 158.888736 152.278272 
+Q 172.628928 152.278272 172.628928 144.116064 
+L 172.628928 95.142816 
+Q 172.628928 86.980608 158.888736 86.980608 
+L 30.646944 86.980608 
+Q 16.906752 86.980608 16.906752 95.142816 
+L 16.906752 144.116064 
+Q 16.906752 152.278272 30.646944 152.278272 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #eaf4f5; stroke: #157a87; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 236.749824 113.734512 
+L 426.059136 113.734512 
+Q 439.799328 113.734512 439.799328 105.572304 
+L 439.799328 65.668176 
+Q 439.799328 57.505968 426.059136 57.505968 
+L 236.749824 57.505968 
+Q 223.009632 57.505968 223.009632 65.668176 
+L 223.009632 105.572304 
+Q 223.009632 113.734512 236.749824 113.734512 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #eaf4f5; stroke: #157a87; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 236.749824 190.822032 
+L 426.059136 190.822032 
+Q 439.799328 190.822032 439.799328 182.659824 
+L 439.799328 142.755696 
+Q 439.799328 134.593488 426.059136 134.593488 
+L 236.749824 134.593488 
+Q 223.009632 134.593488 223.009632 142.755696 
+L 223.009632 182.659824 
+Q 223.009632 190.822032 236.749824 190.822032 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #edf0fb; stroke: #5468ba; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 519.187104 152.278272 
+L 739.030176 152.278272 
+Q 752.770368 152.278272 752.770368 144.116064 
+L 752.770368 95.142816 
+Q 752.770368 86.980608 739.030176 86.980608 
+L 519.187104 86.980608 
+Q 505.446912 86.980608 505.446912 95.142816 
+L 505.446912 144.116064 
+Q 505.446912 152.278272 519.187104 152.278272 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #eaf4f5; stroke: #157a87; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 519.187104 274.711392 
+L 739.030176 274.711392 
+Q 752.770368 274.711392 752.770368 266.549184 
+L 752.770368 213.041376 
+Q 752.770368 204.879168 739.030176 204.879168 
+L 519.187104 204.879168 
+Q 505.446912 204.879168 505.446912 213.041376 
+L 505.446912 266.549184 
+Q 505.446912 274.711392 519.187104 274.711392 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #eaf4f5; stroke: #157a87; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 34.463664 270.176832 
+L 406.975536 270.176832 
+Q 420.715728 270.176832 420.715728 262.014624 
+L 420.715728 213.041376 
+Q 420.715728 204.879168 406.975536 204.879168 
+L 34.463664 204.879168 
+Q 20.723472 204.879168 20.723472 213.041376 
+L 20.723472 262.014624 
+Q 20.723472 270.176832 34.463664 270.176832 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #f4f6f9; stroke: #a8b4c3; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 34.463664 424.351872 
+L 208.506096 424.351872 
+Q 222.246288 424.351872 222.246288 416.189664 
+L 222.246288 362.681856 
+Q 222.246288 354.519648 208.506096 354.519648 
+L 34.463664 354.519648 
+Q 20.723472 354.519648 20.723472 362.681856 
+L 20.723472 416.189664 
+Q 20.723472 424.351872 34.463664 424.351872 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #fcedf0; stroke: #c6576e; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 286.367184 424.351872 
+L 468.043056 424.351872 
+Q 481.783248 424.351872 481.783248 416.189664 
+L 481.783248 362.681856 
+Q 481.783248 354.519648 468.043056 354.519648 
+L 286.367184 354.519648 
+Q 272.626992 354.519648 272.626992 362.681856 
+L 272.626992 416.189664 
+Q 272.626992 424.351872 286.367184 424.351872 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #eaf4f5; stroke: #157a87; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 553.537584 424.351872 
+L 735.213456 424.351872 
+Q 748.953648 424.351872 748.953648 416.189664 
+L 748.953648 362.681856 
+Q 748.953648 354.519648 735.213456 354.519648 
+L 553.537584 354.519648 
+Q 539.797392 354.519648 539.797392 362.681856 
+L 539.797392 416.189664 
+Q 539.797392 424.351872 553.537584 424.351872 
+z
+" clip-path="url(#p667ae959d8)" style="fill: #eaf4f5; stroke: #157a87; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 18.43344 296.47728 
+L 751.24368 296.47728 
+" clip-path="url(#p667ae959d8)" style="fill: none; stroke: #dde3ea; stroke-linecap: square"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172638" x="10.8" y="32.038871" transform="rotate(-0 10.8 32.038871)">A 16-entry codebook in four 32-bit words</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #46566a" x="10.8" y="46.623024" transform="rotate(-0 10.8 46.623024)">The current decoder stores each FP16 entry’s high byte; every low byte is zero.</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(47.996903 115.082237)">4 packed codes</text>
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(65.430653 130.799143)">4 × 4 bits</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(285.686511 81.830904)">Bank 0: codes 0–7</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(300.369324 94.928326)">8 high bytes</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(282.505261 158.918424)">Bank 1: codes 8–15</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(300.369324 172.015846)">8 high bytes</text>
+   </g>
+   <g id="patch_11">
+    <path d="M 165.331268 109.822734 
+Q 192.094069 99.223972 217.401588 89.201539 
+" style="fill: none; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 212.055123 88.737525 
+L 217.401588 89.201539 
+L 213.822498 93.200303 
+z
+" style="fill: #536678; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 165.156552 129.76799 
+Q 192.091947 146.835372 217.705175 163.064975 
+" style="fill: none; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 214.935179 158.46855 
+L 217.705175 163.064975 
+L 212.366037 162.523117 
+z
+" style="fill: #536678; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #46566a" x="197.055936" y="117.36216" transform="rotate(-0 197.055936 117.36216)">q &amp; 7</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(562.220906 115.46117)">Select each code’s bank</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(600.081531 129.868335)">using bit 3</text>
+   </g>
+   <g id="patch_13">
+    <path d="M 440.18892 88.456693 
+Q 472.621312 98.089743 503.553243 107.277128 
+" style="fill: none; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 499.635261 103.609783 
+L 503.553243 107.277128 
+L 498.268578 108.211107 
+z
+" style="fill: #536678; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 440.063125 164.088692 
+Q 472.621948 147.97102 503.777995 132.547768 
+" style="fill: none; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 498.411475 132.526398 
+L 503.777995 132.547768 
+L 500.540987 136.828163 
+z
+" style="fill: #536678; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #46566a" x="331.40448" y="125.070912" transform="rotate(-0 331.40448 125.070912)">Two PRMT lookups</text>
+   </g>
+   <g id="patch_15">
+    <path d="M 629.10864 155.638839 
+Q 629.10864 178.577911 629.10864 199.951735 
+" style="fill: none; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 631.50864 195.151735 
+L 629.10864 199.951735 
+L 626.70864 195.151735 
+z
+" style="fill: #536678; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(571.772859 235.62701)">Insert zero low bytes</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(567.547312 250.034175)">→ 4 exact FP16 values</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(131.407725 232.980797)">Example: code 5 → byte 0x42</text>
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(150.226163 248.697703)">FP16 bits 0x4200 → 3.0</text>
+   </g>
+   <g id="patch_16">
+    <path d="M 512.608294 242.06256 
+Q 468.806469 242.06256 426.569892 242.06256 
+" style="fill: none; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 431.369892 244.46256 
+L 426.569892 242.06256 
+L 431.369892 239.66256 
+z
+" style="fill: #536678; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #172638" x="26.06688" y="319.15008" transform="rotate(-0 26.06688 319.15008)">Dual LUT: choose the whole codebook once per group</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(73.367614 385.26749)">Stored scale bit 0</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(77.130818 399.674655)">chooses T₀ or T₁</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(314.495667 385.26749)">Same register decoder</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(323.909261 399.674655)">16 levels per group</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(594.463801 385.646424)">× stored FP16 scale</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: #172638" transform="translate(582.878645 398.743846)">→ FP16 tensor-core MMA</text>
+   </g>
+   <g id="patch_17">
+    <path d="M 226.535066 389.43576 
+Q 247.434804 389.43576 266.769294 389.43576 
+" style="fill: none; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 261.969294 387.03576 
+L 266.769294 389.43576 
+L 261.969294 391.83576 
+z
+" style="fill: #536678; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 486.072492 389.43576 
+Q 510.790048 389.43576 533.942356 389.43576 
+" style="fill: none; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 529.142356 387.03576 
+L 533.942356 389.43576 
+L 529.142356 391.83576 
+z
+" style="fill: #536678; stroke: #536678; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #46566a" x="26.06688" y="452.9196" transform="rotate(-0 26.06688 452.9196)">Two tables offer two alternative sets of 16 levels. The table-selection bit is shared by the group, not stored per weight.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p667ae959d8">
+   <rect x="10.8" y="10.8" width="763.344" height="453.456"/>
+  </clipPath>
+ </defs>
+</svg>
