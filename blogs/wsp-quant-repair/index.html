@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Repairing a Quantized LLM using Weight Space Programming</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>:root{box-sizing:border-box}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style id="page-style">
+/* Layout: one reading column (~66ch) for the essay, wider bands for figures; data set in mono. Blue = repair, orange = damage. */
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --ink: #151a23; --ink2: #4c5567; --rule: #dce0e7; --muted: #a9b0bd;
+  --fix: #2456d3; --fix-soft: #dbe5fb; --damage: #b9541a; --damage-soft: #f6e1d3; --deep: #163a8f;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1219; --surface: #151b25; --ink: #e6e9ef; --ink2: #9ca5b6; --rule: #283040; --muted: #5d6679;
+  --fix: #7ea3ff; --fix-soft: #1d2a4a; --damage: #f19a5e; --damage-soft: #3a2518; --deep: #b9cbff; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e1219; --surface: #151b25; --ink: #e6e9ef; --ink2: #9ca5b6; --rule: #283040; --muted: #5d6679;
+  --fix: #7ea3ff; --fix-soft: #1d2a4a; --damage: #f19a5e; --damage-soft: #3a2518; --deep: #b9cbff; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 64px; }
+.col { max-width: 44rem; margin: 0 auto; }
+.wide { max-width: 64rem; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.7rem; font-weight: 600; margin-top: 3.2rem; }
+h3 { font-size: 1.2rem; font-weight: 600; margin-top: 2rem; }
+p { margin: 0.8rem 0; }
+.byline { font-family: var(--mono); font-size: 0.8rem; color: var(--ink2); margin-top: 0.8rem; }
+.kicker { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fix); margin-top: 2.6rem; }
+code, .num { font-family: var(--mono); font-size: 0.86em; }
+.num { font-variant-numeric: tabular-nums; }
+.lede-stats { display: flex; flex-wrap: wrap; gap: 12px 32px; margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.lede-stats div { min-width: 0; }
+.lede-stats b { display: block; font-family: var(--mono); font-size: 1.3rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.lede-stats span { font-size: 0.88rem; color: var(--ink2); }
+.fig { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; margin: 1.4rem 0; min-width: 0; }
+.fig-title { font-family: var(--display); font-weight: 600; font-size: 1.05rem; }
+.fig-note { font-size: 0.85rem; color: var(--ink2); margin-top: 0.6rem; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0.6rem 0; }
+button.seg { font-family: var(--mono); font-size: 0.8rem; padding: 6px 11px; border-radius: 6px; border: 1px solid var(--rule); background: var(--bg); color: var(--ink); cursor: pointer; }
+button.seg[aria-pressed="true"] { background: var(--fix); border-color: var(--fix); color: var(--surface); }
+button.seg:focus-visible, input[type=range]:focus-visible { outline: 2px solid var(--fix); outline-offset: 2px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-family: var(--display); font-weight: 600; color: var(--ink2); }
+td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+td.txt { font-family: var(--body); white-space: normal; text-align: left; }
+tr.hi td { background: var(--fix-soft); font-weight: 500; }
+tr.ref td { color: var(--ink2); }
+.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 10px; }
+.readout > div { border-top: 2px solid var(--rule); padding-top: 6px; min-width: 0; }
+.readout .k { font-size: 0.78rem; color: var(--ink2); font-family: var(--mono); }
+.readout .v { font-family: var(--mono); font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.readout .bad { border-top-color: var(--damage); } .readout .good { border-top-color: var(--fix); }
+svg text { font-family: var(--mono); font-size: 11px; fill: var(--ink2); }
+svg .t-ink { fill: var(--ink); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 0.78rem; color: var(--ink2); margin-top: 6px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+canvas { max-width: 100%; display: block; image-rendering: pixelated; }
+.mapgrid { display: grid; grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); gap: 18px; align-items: start; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+@media (max-width: 720px) { .mapgrid { grid-template-columns: 1fr; } }
+input[type=range] { width: 100%; accent-color: var(--fix); }
+blockquote { margin: 1rem 0; padding: 0.2rem 0 0.2rem 1rem; border-left: 3px solid var(--fix); color: var(--ink); }
+.small { font-size: 0.88rem; color: var(--ink2); }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin-top: 10px; }
+.flow .box { flex: 1 1 120px; min-width: 0; border: 1px solid var(--rule); border-radius: 8px; padding: 10px; background: var(--bg); }
+.flow .box b { display: block; font-family: var(--display); font-size: 1rem; }
+.flow .box span { font-size: 0.8rem; color: var(--ink2); }
+.flow .box.on { border-color: var(--fix); background: var(--fix-soft); }
+.flow .arr { align-self: center; color: var(--muted); font-family: var(--mono); }
+.refs { font-size: 0.9rem; } .refs li { margin: 0.3rem 0; }
+footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: 0.88rem; color: var(--ink2); }
+a { color: var(--fix); }
+sup a { text-decoration: none; font-family: var(--mono); font-size: 0.75em; }
+img.th-dark { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) img.th-light { display: none !important; } :root:not([data-theme="light"]) img.th-dark { display: block; } }
+:root[data-theme="dark"] img.th-light { display: none !important; } :root[data-theme="dark"] img.th-dark { display: block; }
+.surf { max-width: 40rem; margin: 0 auto; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="col">
+  <p class="byline"><a href="/blogs/">← Abdelfattah Research Group blog</a></p>
+  <h1>Repairing a Quantized LLM using Weight Space Programming</h1>
+  <div class="byline">November 2026 · Yahya Emara, Chi-Chih Chang, Mohamed Abdelfattah</div>
+  <p>We quantize a lot of models. Usually it goes like this: take a checkpoint, squeeze it down to a few bits per weight, watch some benchmark fall off a cliff, then spend a week poking at the calibration set until it mostly comes back. It works, kind of. But it always feels like fixing a watch by shaking it.</p>
+  <p>So we tried something sillier. We handed a broken 3-bit checkpoint to an LLM agent, gave it a Python session with the weights loaded, and asked it to find what went wrong and fix it, by editing the weights directly and without fitting them to any data. On Nemotron-3.5-Lightning-30B-A3B it found two broken matrices out of 5,959, edited about one weight in 120,000, and closed most of the gap to the NVFP4 release.</p>
+  <div class="lede-stats">
+    <div><b>71.4 → 91.6</b><span>GSM8K, poorly calibrated 3-bit</span></div>
+    <div><b>30.8 → 48.6</b><span>LiveCodeBench v6</span></div>
+    <div><b>0.0008%</b><span>of weights edited</span></div>
+    <div><b>0</b><span>weights fitted to data</span></div>
+  </div>
+</header>
+
+<section class="col">
+  <h2>How quantization usually works</h2>
+  <p>The standard recipe is calibration plus post-training quantization (PTQ): run a small calibration set through the model, then let a method like GPTQ<sup><a href="#r1">1</a></sup> or AWQ<sup><a href="#r2">2</a></sup> use those activations to decide how to round the weights. You get a 2–4-bit model that fits on smaller devices and decodes faster, since decoding is memory-bound.</p>
+</section>
+<section class="wide">
+  <div class="fig">
+    <div class="flow">
+      <div class="box"><b>Source model</b><span>BF16 or NVFP4</span></div><div class="arr">→</div>
+      <div class="box"><b>Calibration</b><span>~100 text sequences → layer activations</span></div><div class="arr">→</div>
+      <div class="box"><b>PTQ</b><span>GPTQ, AWQ, …</span></div><div class="arr">→</div>
+      <div class="box"><b>Low-bit model</b><span>2–4 bits, lossy</span></div>
+    </div>
+    <div class="fig-note">The usual quantization pipeline.</div>
+  </div>
+</section>
+<section class="col">
+  <h2>Some bitter lessons</h2>
+  <p>If you have pushed PTQ to aggressive bit widths, you have probably hit all three of these:</p>
+  <ul>
+    <li><b>Calibration data matters way more than it should.</b> Finding the right mix of domains, lengths and formats is basically alchemy. A blend that helps math hurts code, and nobody can tell you the right one ahead of time.</li>
+    <li><b>Aggressive formats leave a gap.</b> At 3 bits and below, even good methods lose accuracy, and the loss is lumpy across tasks.</li>
+    <li><b>Often you don't have the recipe.</b> If all you get is a released checkpoint, you don't know what it was trained on, so you can't build a calibration set that matches. For the model in this post, the only source we had was the NVFP4 release.</li>
+  </ul>
+  <p>All three treat the quantized model as a black box you can only re-run with different inputs. We wanted to open the box.</p>
+
+  <h2>What if the LLM fixes the model itself?</h2>
+  <p>Our starting point is recent weight-space programming work<sup><a href="#r3">3</a></sup>: frontier LLMs can read and write neural network weights directly. In their Experiment 8 the agent makes Qwen3.5-0.8B much better by fixing its reasoning loops, editing 0.016% of its weights, with no gradients and no training loop.</p>
+  <p>Repairing a quantized checkpoint looked like a natural fit, with one big advantage: we know what every weight is <i>supposed</i> to be, because we have the higher-precision source to compare against. We gave the agent this brief:</p>
+  <blockquote>This 3-bit checkpoint should behave like the NVFP4 model. Find what is broken and fix it inside the 3-bit format. You may run the model and read its weights and activations; you may not fit weights to data (no GPTQ, no least-squares refits, no training).</blockquote>
+  <p>The agent starts from the finished 3-bit checkpoint, not from NVFP4. The NVFP4 weights are its reference: they tell it how far the 3-bit model is from where it should be, and every new 3-bit value it writes is the NVFP4 weight rounded again under a different rule. Whoever quantizes a model has its source weights, so this needs nothing extra.</p>
+</section>
+<section class="wide">
+  <div class="fig">
+    <div class="fig-title">The repair loop</div>
+    <svg id="loop" viewBox="0 0 900 150" style="width:100%;height:auto;margin-top:8px" role="img" aria-label="The repair loop: measure, localize, read and edit, keep or revert, repeat"></svg>
+    <div class="fig-note">The agent edits the 3-bit weights directly. After each edit it scores the model on validation data: KL to NVFP4 on held-out chat math, code and prose, perplexity, MMLU-val, GSM8K-dev, and how well it predicts NVFP4's own answers. It keeps the edit if those improve without regressions and reverts it otherwise. Test sets are never used.</div>
+  </div>
+</section>
+
+<section class="col">
+  <h2>Results</h2>
+  <p>Our test model is Nemotron-3.5-Lightning-30B-A3B, a Mamba + attention + mixture-of-experts model with 30B total and about 3B active parameters. The only source checkpoint is the NVFP4 release. We ran the brief from two 3-bit checkpoints of it, both made with GPTQ<sup><a href="#n1">*</a></sup>: a <b>poorly calibrated</b> one and a <b>well-calibrated</b> one. Each was evaluated once on the test sets, before and after the agent's edits.</p>
+</section>
+<section class="wide">
+  <div class="fig">
+    <div class="scroll"><table id="results"></table></div>
+    <div class="fig-title" style="margin-top:16px">Share of the gap to NVFP4 closed by the agent edits</div>
+    <svg id="gapbars" viewBox="0 0 900 175" style="width:100%;height:auto;margin-top:6px"></svg>
+    <div class="legend"><span><i style="background:var(--fix)"></i>poorly calibrated + agent edits</span><span><i style="background:var(--deep)"></i>well-calibrated + agent edits</span></div>
+    <div class="fig-note">GSM8K and MATH-500 greedy, thinking off. LiveCodeBench (131 problems from 2025-02 on) and GPQA Diamond: thinking on, 3 and 4 samples, 32K tokens. MMLU 0-shot. WikiText-2 perplexity, lower is better. 3-bit weights dequantized to BF16 in vLLM, one GPU (GSM8K on quantized checkpoints shifted with the number of GPUs, 84.3% on two vs 93.1% on one for the same checkpoint, so every number here uses one).</div>
+  </div>
+</section>
+<section class="col">
+  <p>On the poorly calibrated checkpoint, two edited matrices close 64–86% of the gap on every benchmark, and the edited checkpoint ends up level with or ahead of the well-calibrated one. On the well-calibrated checkpoint the same kind of edit closes most of the MMLU and perplexity gap but adds only a few points on generation.</p>
+  <p>The gains are mostly better answers, not just shorter ones. A sample that hits the token cap almost never scores, so we split each gain into "finishes more often" and "better answers when it finishes":</p>
+</section>
+<section class="wide">
+  <div class="fig">
+    <div class="controls" role="group" aria-label="Checkpoint">
+      <button class="seg" id="cap-poor" aria-pressed="true">Poorly calibrated + agent edits</button>
+      <button class="seg" id="cap-well" aria-pressed="false">Well-calibrated + agent edits</button>
+    </div>
+    <svg id="caps" viewBox="0 0 900 190" style="width:100%;height:auto" role="img" aria-label="Gain split into finishing and better answers"></svg>
+    <div class="legend"><span><i style="background:var(--muted)"></i>from finishing more often</span><span><i style="background:var(--fix)"></i>from better finished answers</span></div>
+  </div>
+</section>
+
+<section class="col">
+  <div class="kicker">Case study</div>
+  <h2 style="margin-top:.4rem">How the agent found the defect, and how it fixed it</h2>
+  <p>Everything here was done by reading tensors and printing numbers in a Python session. We follow the agent on the well-calibrated checkpoint. The defect sits in the same weights in both checkpoints, and the same fixes repair both.<sup><a href="#n2">†</a></sup></p>
+
+  <h3>1. Measure</h3>
+  <p>Both models read the same held-out text, and at every token we compare their next-token distributions (KL divergence).</p>
+  <div class="scroll"><table id="t-measure"></table></div>
+  <p>Code and prose are 14× worse than chat math. After all the repairs that ratio is about 7×, so part of it is normal, but twice the usual gap hinted that something specific was broken, and that it hit raw text harder than chat.</p>
+
+  <h3>2. Localize</h3>
+  <p>There are 5,959 quantized matrices, too many to read. So the agent put a whole kind of matrix back to NVFP4 and measured how much KL disappeared, then did the same one matrix at a time within the worst kind.</p>
+</section>
+<section class="wide"><div class="fig">
+  <div class="two"><div style="min-width:0"><div class="small">By kind of matrix</div><svg id="s1a" viewBox="0 0 460 170" style="width:100%;height:auto"></svg></div>
+  <div style="min-width:0"><div class="small">One Mamba out_proj at a time (top 6 of 23)</div><svg id="s1b" viewBox="0 0 460 200" style="width:100%;height:auto"></svg></div></div>
+  <div class="legend"><span><i style="background:var(--muted)"></i>math KL removed</span><span><i style="background:var(--deep)"></i>code</span><span><i style="background:var(--fix)"></i>prose</span></div>
+</div></section>
+<section class="col">
+  <p>One matrix, layer 4's Mamba <code>out_proj</code>, holds about two thirds of the code and prose damage. Its shape: 4,096 inputs, 2,688 outputs.</p>
+
+  <h3>3. Read the matrix: find the outlier</h3>
+  <p>First, what this matrix does. At every token the layer computes <i>y</i> = <i>xW</i>: <i>x</i> is a vector of 4,096 numbers coming out of the Mamba mixer, and <i>y</i> is 2,688 numbers passed on to the rest of the model. Each of the 4,096 positions in <i>x</i> is an <b>input channel</b>. Channel 1347 is position 1347 of <i>x</i>, the same position at every token. Each channel has its own row of <i>W</i>: the 2,688 weights it is multiplied by, one per output. So channel 1347 is an input, and row 1347 of <i>W</i> holds the weights that multiply it.</p>
+  <p>The weights alone don't say which inputs are large, so the agent ran the NVFP4 model on a few dozen held-out sequences (chat math and prose) and saved <i>x</i> at every token. Here are a few channels:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>|<i>x</i>| at token</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>10</th><th>50</th></tr></thead>
+    <tbody>
+    <tr class="hi"><td>channel 1347</td><td>19.3</td><td>59.8</td><td>54.0</td><td>0.006</td><td>0.006</td><td>0.027</td><td>0.008</td></tr>
+    <tr><td>channel 4087</td><td>0.47</td><td>0.32</td><td>0.37</td><td>0.49</td><td>0.47</td><td>0.50</td><td>0.51</td></tr>
+    <tr><td>channel 500</td><td>0.002</td><td>0.003</td><td>0.002</td><td>0.005</td><td>0.004</td><td>0.004</td><td>0.003</td></tr>
+    <tr><td>median of all 4,096</td><td>0.002</td><td>0.002</td><td>0.002</td><td>0.004</td><td>0.004</td><td>0.006</td><td>0.007</td></tr>
+    </tbody></table></div>
+  <p class="small">Mean |<i>x</i>| at each token position over 29 sequences.</p>
+  <p>To compare all 4,096 channels with one number, the agent computed each channel's <b>energy</b>: the average of <i>x</i>² over all saved tokens. After the third token channel 1347 is as quiet as any other channel, but its first three values are so large that they dominate the average: its energy is 117,000× the median channel's. The next largest, channel 4087, reaches 1,366× by being steadily about 0.5. Here is the whole grid, all 4,096 channels by the first 64 tokens:</p>
+</section>
+<section class="wide"><div class="fig">
+  <div class="fig-title">The input <i>x</i> to layer 4's Mamba out_proj, channel × token</div>
+  <div class="surf"><img class="th-light" src="img/surface_x_light.png" alt="3D surface of |x| over 4,096 input channels and the first 64 tokens; one channel spikes on the first tokens" style="width:100%;height:auto;display:block"><img class="th-dark" src="img/surface_x_dark.png" alt="3D surface of |x| over 4,096 input channels and the first 64 tokens; one channel spikes on the first tokens" style="width:100%;height:auto"></div>
+  <div class="fig-note">Mean |<i>x</i>| over 29 sequences, first 64 tokens, channels pooled by 16 (max), log scale. The one spike is channel 1347 on tokens 1–3, at 20–60; every other channel stays below 2, and a typical one below 0.01.</div>
+</div></section>
+<section class="col">
+  <p>Energy matters because a weight's rounding error only becomes output error when it is multiplied by its input. A weight that is off by 0.002 adds 0.002 × 0.005 = 0.00001 to an output when its channel holds a typical value, and 0.002 × 60 = 0.12 when it is channel 1347 on token 2. So the agent scored each row of <i>W</i> by how much output error it causes: the squared rounding error of its weights times its channel's energy. One row carries most of it.</p>
+</section>
+<section class="wide"><div class="fig">
+  <div class="fig-title">Which rows of <i>W</i> cause this layer's output error</div>
+  <svg id="rowshare" viewBox="0 0 900 200" style="width:100%;height:auto;margin-top:6px;cursor:crosshair" role="img" aria-label="Share of the layer's output error caused by each row of W; row 1347 causes 71%"></svg>
+  <div class="small num" id="rowshare-ro" style="min-height:1.4em"></div>
+  <div class="fig-note">One bar per row of <i>W</i> (one input channel): the share of this layer's output error caused by that row's weights, i.e. their squared rounding error times the channel's input energy. Hover to read any row.</div>
+</div></section>
+<section class="col">
+  <div class="scroll"><table id="t-channels"></table></div>
+  <p>Channel 1347 is 20–60 on the first three tokens of every sequence and about 0.01 afterwards, like every other channel. Language models often keep a few such channels, huge on the first tokens and silent after; in attention models such channels are known as attention sinks<sup><a href="#r4">4</a></sup> or massive activations<sup><a href="#r5">5</a></sup>. We call it the outlier channel. The model needs it; the problem is the row of weights that multiplies it.</p>
+
+  <h3>4. Zoom into the outlier row</h3>
+  <p>Row 1347 of <i>W</i> holds one weight per output, 2,688 in all. Its median magnitude is 0.0006, twenty times smaller than the matrix's typical weight. Here is how the format stores a weight: each group of 32 weights shares one scale <i>s</i>, and each weight is stored as one of 8 levels times <i>s</i>, with levels ±0.41, ±1.25, ±2.25 and ±3.5. The 3-bit code picks the level; the scale sets how big the levels are. Each of the outlier channel's weights shares its group with large neighbours, and the scale is sized for them, so the smallest value the group can store, 0.41 × <i>s</i>, is about 0.003: five times the weight. Here is one of those groups, for output 101:</p>
+</section>
+<section class="wide"><div class="fig">
+  <div class="fig-title">One real group: inputs 1344–1375 feeding output 101</div>
+  <p class="small" style="margin:.3rem 0 0">Dots are the 32 NVFP4 weights; ticks are the 8 values the group can store; lines show where nearest rounding sends each weight. Blue is the outlier channel's weight, <i>W</i><sub>1347, 101</sub> = 0.000496. Drag the group scale.</p>
+  <svg id="grid" viewBox="0 0 900 190" role="img" aria-label="Weights of one group and the 8 storable values" style="width:100%;height:auto;margin-top:8px"></svg>
+  <label for="scale" class="small">Group scale: <span id="scale-lbl" class="num"></span> × the quantized checkpoint's</label>
+  <input type="range" id="scale" min="0.12" max="1.2" step="0.005" value="1">
+  <div class="controls"><button class="seg" id="sc-gptq">As quantized (1×)</button><button class="seg" id="sc-edit">Fix 1: store this weight exactly</button></div>
+  <div class="readout">
+    <div><div class="k">this weight, NVFP4</div><div class="v num" id="v-sink"></div></div>
+    <div id="ro-sinkerr"><div class="k">stored as / error</div><div class="v num" id="v-sinkerr"></div></div>
+    <div id="ro-contrib"><div class="k">× input 50 (tokens 2–3)</div><div class="v num" id="v-contrib"></div></div>
+    <div id="ro-rest"><div class="k">other 31 weights, error</div><div class="v num" id="v-rest"></div></div>
+  </div>
+</div></section>
+<section class="col">
+  <p>As quantized, this weight is stored as 0.002591 against a true 0.000496. On tokens 2 and 3, where input 1347 is about 50, that one product is 0.130 instead of 0.025, an excess of 0.105 in output 101; later in the sequence, where the input is 0.01, the same weight error adds only 0.00002. The error is in the weight, and the input decides how much it matters. Across all 2,688 outputs, 86% of the outlier channel's weights are under half the smallest storable value: median error 422%.</p>
+  <p><b>The explanation, in one sentence:</b> the most active input in this layer is multiplied by weights stored about 5× too large, because the grid has nothing that small.</p>
+
+  <h3>5. Fix 1, and a surprise</h3>
+  <p>No 3-bit code can fix this weight: with this scale, nothing smaller than 0.0026 exists. So fix 1 changes the <b>scale</b> instead. The new scale is not searched for or fitted; it follows from three steps:</p>
+  <ol>
+    <li><b>Make the weight exact.</b> A stored weight is level × <i>s</i>, so for it to equal <i>w</i> the scale must be <i>s</i> = <i>w</i> / level. The weight is positive, so that leaves four candidates, one per positive level: 0.000496 divided by 0.41, 1.25, 2.25 or 3.5 gives 0.0012, 0.0004, 0.0002 or 0.0001.</li>
+    <li><b>Keep the candidate that hurts the other 31 weights least.</b> The agent rounds the other 31 weights to nearest under each candidate and keeps the one with the smallest weight error (no activations involved). Here that is the largest scale, 0.0012: it lets the group store values up to 0.0043, against 0.0014 or less for the others, so the fewest weights clip.</li>
+    <li><b>Store the scale.</b> Scales are kept in 8 bits, so 0.00122 is rounded to 0.00120, and the weight is stored as 0.000486 rather than exactly 0.000496.</li>
+  </ol>
+  <p>Here is the group from step 4, before and after:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Output 101, inputs 1344–1375</th><th>scale <i>s</i></th><th>the 8 storable values</th><th>channel 1347's weight (true 0.000496)</th><th>largest weight (true 0.039)</th><th>group error</th></tr></thead>
+    <tbody>
+    <tr><td>As quantized</td><td>0.0064</td><td>±0.0026 ±0.0080 ±0.0143 ±0.0223</td><td>0.002591 (422% off)</td><td>0.0223</td><td>1.2 × 10⁻⁴</td></tr>
+    <tr class="hi"><td>Fix 1</td><td>0.0012</td><td>±0.0005 ±0.0015 ±0.0027 ±0.0042</td><td>0.000486 (2% off)</td><td>0.0042 (clipped)</td><td>0.07 × 10⁻⁴</td></tr>
+    </tbody></table></div>
+  <p class="small">Group error: each weight's squared error times its channel's input energy, summed over the 32 weights.</p>
+  <p><b>The price.</b> With the smaller scale, the largest value the group can store falls from 0.0223 to 0.0042, so 27 of the other 31 weights clip. Those weights are now much worse, yet the group's error falls 18×, because their channels' inputs are tiny: as quantized, 82% of the group's error came from channel 1347 alone. Press "Fix 1: store this weight exactly" on the figure above to watch the levels shrink and the large weights pile up at the edges.</p>
+  <p><b>Across the matrix.</b> The same rule runs once per output: for each of the 2,688 outputs, it rewrites one scale (the group holding input 1347) and re-rounds the 32 codes under it. That is 2,688 scales and 85,286 changed codes. Only the NVFP4 weights, the 8 levels and the scale format go in; no data. Across all 2,688 outputs, the outlier channel's median weight error drops from 422% to under 2%.</p>
+</section>
+<section class="wide"><div class="fig">
+  <div class="fig-title">All 2,688 of the outlier channel's weights: true vs stored</div>
+  <canvas id="sinksc" width="320" height="320" style="width:min(320px,100%);margin-top:8px"></canvas>
+  <div class="legend"><span><i style="background:var(--muted)"></i>as quantized</span><span><i style="background:var(--fix)"></i>after fix 1</span><span>dashed: stored exactly</span></div>
+  <div class="fig-note">One dot per output; weights with |<i>w</i>| &lt; 0.006. As quantized, every weight sits in one of two bands at about ±0.0026, the smallest values its group can store. After fix 1 they lie on the diagonal.</div>
+</div></section>
+<section class="col">
+  <p>On validation, prose KL fell threefold. But chat math got <i>worse</i>: GSM8K-dev went from 93.1% to 85.6%. A fix that only makes weights more correct should not make the model worse, so the explanation was incomplete, and the agent went back to reading.</p>
+
+  <h3>6. The hidden compensation</h3>
+  <p><b>What GPTQ does when it can't store a weight.</b> GPTQ quantizes a matrix one row of <i>W</i> at a time while watching the layer's output on its calibration text. After it stores a row, it adjusts the rows it has not stored yet, so that on the calibration tokens the layer's output stays as close as possible to the original. When one row comes out badly, other rows absorb its error.</p>
+  <p>That is what happened to row 1347. Its weights were stored about 5× too big, which pushes outputs too high on tokens 1–3. GPTQ could not fix that row, so it pushed the outputs back down through other rows, ones whose inputs are also active on the first tokens. We call this <b>bending</b> a row: storing its weights far from their true values, often with the opposite sign, so that the row's contribution cancels row 1347's error. Three weights of row 3492:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Row 3492</th><th>true (NVFP4)</th><th>plain rounding</th><th>stored by GPTQ</th></tr></thead>
+    <tbody>
+    <tr><td>weight a</td><td>−0.0134</td><td>−0.0168</td><td>+0.0471</td></tr>
+    <tr><td>weight b</td><td>+0.0079</td><td>+0.0049</td><td>−0.0418</td></tr>
+    <tr><td>weight c</td><td>+0.0342</td><td>+0.0272</td><td>−0.0272</td></tr>
+    </tbody></table></div>
+  <p class="small">Plain rounding keeps each weight close to its true value. GPTQ stored all three far away and with the opposite sign, on purpose.</p>
+  <p>Two wrongs make an approximate right, but only where GPTQ looked: on the first tokens of its calibration text. On every other token the bent rows are plain error. And once fix 1 stored row 1347 correctly, there was nothing left for them to cancel, so they became error everywhere, including on the chat math that this checkpoint's calibration had covered.</p>
+  <p><b>How the agent found the bent rows</b>, without data:</p>
+  <ol>
+    <li>For every row of <i>W</i>, round the NVFP4 weights to nearest under the scales already stored. That is what the row would hold without compensation.</li>
+    <li>Divide how far GPTQ's stored row is from the true weights by how far the plain rounding is.</li>
+    <li>Flag rows above 3×. GPTQ nudges every row a little, so a normal row sits around 1.1×. In this matrix, 86 rows were 3–14×.</li>
+  </ol>
+</section>
+<section class="wide"><div class="fig">
+  <div class="two">
+    <div style="min-width:0"><div class="fig-title">Rows sorted by distance from the true weights (GPTQ ÷ plain rounding)</div>
+      <svg id="scan" viewBox="0 0 900 260" style="width:100%;height:auto" role="img" aria-label="Sorted ratios for three matrices"></svg>
+      <label for="thr" class="small">Threshold: <span id="thr-lbl" class="num"></span>×</label>
+      <input type="range" id="thr" min="1.5" max="8" step="0.1" value="3">
+      <div class="readout" id="scan-ro"></div></div>
+    <div style="min-width:0"><div class="fig-title">Row 3492: true vs stored</div>
+      <canvas id="comp" width="320" height="320" style="width:min(320px,100%);margin-top:8px"></canvas>
+      <div class="legend"><span><i style="background:var(--muted)"></i>as quantized</span><span><i style="background:var(--fix)"></i>after fix 2</span><span>dashed: stored exactly</span></div></div>
+  </div>
+  <div class="fig-note">Left: the 400 worst rows of three matrices; a healthy matrix (layer 7) stays near 1×. Right: each dot is one of row 3492's 2,688 weights. 97% of its codes differ from plain rounding, many with the wrong sign.</div>
+</div></section>
+<section class="col">
+  <p><b>Fix 2:</b> undo the bending. Re-round those 86 rows to nearest, keeping their scales, so each weight goes back next to its true value (the blue dots on the right). Again no data goes in. The scan behind it needs only the stored weights and the NVFP4 weights, and it is cheap enough to run on all 5,959 matrices: its top three are the matrices the agent ended up repairing.</p>
+
+  <h3>7. What changed in the matrix</h3>
+</section>
+<section class="wide"><div class="fig">
+  <div class="fig-title">Output error per weight of <i>W</i>, before and after the fixes</div>
+  <img class="th-light" src="img/surface_err_light.png" alt="3D surfaces of per-weight output error before and after; a wall at row 1347 disappears after the fixes" style="width:100%;height:auto;display:block"><img class="th-dark" src="img/surface_err_dark.png" alt="3D surfaces of per-weight output error before and after; a wall at row 1347 disappears after the fixes" style="width:100%;height:auto">
+  <div class="fig-note">Each weight's squared rounding error times its input channel's energy, pooled 16 × 16, log scale, same axes in both panels. As quantized, row 1347 is a wall across all 2,688 outputs; after fixes 1 and 2 it is gone, and what remains is ordinary rounding noise.</div>
+</div></section>
+<section class="col"><p>Which weights were edited, and the same error as a map you can hover:</p></section>
+<section class="wide"><div class="fig">
+  <div class="controls" role="group" aria-label="Matrix view">
+    <button class="seg" id="mv-edits" aria-pressed="true">Weights edited</button>
+    <button class="seg" id="mv-before" aria-pressed="false">Error before</button>
+    <button class="seg" id="mv-after" aria-pressed="false">Error after</button>
+  </div>
+  <div class="mapgrid">
+    <div style="min-width:0"><canvas id="map2" width="336" height="512" style="width:100%;aspect-ratio:336/512;cursor:crosshair" aria-label="Weight matrix: edits and error"></canvas><div class="legend" id="map-legend"></div></div>
+    <div style="min-width:0"><div class="readout" style="grid-template-columns:1fr" id="ro-map2"></div>
+      <p class="small">The matrix's output error falls from <span class="num" id="m-tot">0.83 to 0.11</span>. What remains at rows 1344–1375 is fix 1's cost, the clipped neighbours.</p></div>
+  </div>
+  <div class="fig-note">Fix 1 is one band of rows, 1344–1375 (the 32-wide groups holding input 1347), across all 2,688 outputs. Fix 2 is 86 single rows, mostly between 3,100 and 4,095. Together: 261,698 of 11 million weights, 2.4% of this matrix.</div>
+</div></section>
+<section class="wide"><div class="fig">
+  <div class="fig-title">KL to NVFP4 by token position</div>
+  <div class="controls"><button class="seg" id="kp-math" aria-pressed="true">chat math</button><button class="seg" id="kp-prose" aria-pressed="false">prose</button></div>
+  <svg id="klpos" viewBox="0 0 900 225" style="width:100%;height:auto"></svg>
+  <div class="fig-note">Fix 1 repairs the start of the sequence. On chat math, fix 2 brings KL down at every position, because the compensation was spread over the whole sequence. With both, GSM8K-dev rose to 94.7%.</div>
+</div></section>
+<section class="col">
+  <h3>8. Go round again</h3>
+  <p>With layer 4 fixed, the agent repeated the loop. Layer 11's <code>out_proj</code> now stood out, although on the original checkpoint it had looked harmless: layer 4's damage had masked it. It had the same defect on input 3917, and the same two fixes repaired it. A third round found a smaller issue in layer 42's attention, where residual channel 2550 sits near a constant −72; there the agent used the one edit that reads activations, an RMS-weighted choice of one group's scale, which we approved explicitly. After that, no candidate edit helped. The same two rules, unchanged, then repaired the poorly calibrated checkpoint.</p>
+
+  <h3>What used data, and what did not</h3>
+  <div class="scroll"><table>
+    <tbody><tr><th>Step</th><th style="text-align:left">Data</th><th style="text-align:left">What exactly</th></tr>
+    <tr><td>Measure and localize</td><td class="txt">validation text</td><td class="txt">KL to NVFP4 on held-out chat math, code and prose</td></tr>
+    <tr><td>Find the outlier channel</td><td class="txt">activations</td><td class="txt">per-channel input energy on a few dozen sequences; any text works</td></tr>
+    <tr><td>Fix 1</td><td class="txt">none</td><td class="txt">scale = weight / level; round the group to nearest</td></tr>
+    <tr><td>Compensation scan, fix 2</td><td class="txt">none</td><td class="txt">stored weights vs plain rounding of the NVFP4 weights</td></tr>
+    <tr><td>Layer 42 edit (well-calibrated only)</td><td class="txt">one number per channel</td><td class="txt">RMS activation weights one group's rounding error (approved exception)</td></tr>
+    <tr><td>Keep or revert</td><td class="txt">validation</td><td class="txt">KL, perplexity, MMLU-val, GSM8K-dev, LiveCodeBench Jan-2025; never test data</td></tr>
+  </tbody></table></div>
+  <p>Data showed where to look and decided keep or revert. On the poorly calibrated checkpoint, every value written came from the NVFP4 weights and the 8 levels alone; the well-calibrated one also has the layer 42 edit.</p>
+
+  <h2>What this means for quantization</h2>
+  <p>GPTQ's objective is fine. Its constraint is the problem: it fixes each group's scale from the group's largest weights <i>before</i> choosing codes. When a group also holds a tiny weight on a huge input, no choice of codes can store it, and GPTQ falls back on cancelling the error through other weights, fitted to the calibration tokens and wrong on most others.</p>
+  <p>That turns into two cheap tools. A <b>repair pass</b> needs no data: scan for compensation, find the outlier channel in one forward pass, apply both fixes. And <b>constrained GPTQ</b> builds the fix into the quantizer: give such groups a scale that can hold the outlier channel's weight, and quantize those weights first. It uses calibration data like ordinary GPTQ, and it ties the agent edits on every test benchmark:</p>
+</section>
+<section class="wide"><div class="fig"><div class="scroll"><table id="t-cgptq"></table></div>
+  <div class="fig-note">Constrained GPTQ re-solves the same two matrices completely, so it changes about 6× more codes than the agent edits. The well-calibrated agent-edit row also includes the layer 42 edit.</div></div></section>
+<section class="col">
+  <h2>Wrapping up</h2>
+  <p>The whole repair took three rounds of the loop and about 30 tested edits, and kept three: two fixes for the outlier channels and one small one in attention. It rewrites existing quantized codes and scales, so the model keeps the same size, format and kernels. It is a step after quantization that works with any quantizer: all it needs is the checkpoint, the higher-precision reference, and a few prompts to read activations and validate on. And because each edit comes with a reason, it tells you what the quantizer got wrong.</p>
+  <p>Two things next. First, scale the agent editing out: many agents working in parallel on many matrices and models, a swarm instead of one session. Second, start earlier: give agents the full-precision checkpoint and let them produce the quantized model themselves, instead of repairing one after the fact.</p>
+
+  <h2>References</h2>
+  <ol class="refs">
+    <li id="r1">Frantar, Ashkboos, Hoefler, Alistarh. GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers. ICLR 2023.</li>
+    <li id="r2">Lin et al. AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration. MLSys 2024.</li>
+    <li id="r3">Takehi, Teoh, Zhang, Khattab. Sparks of Weight-Space Programming: LLMs can natively read &amp; write neural network weights. November 2026.</li>
+    <li id="r4">Xiao et al. Efficient Streaming Language Models with Attention Sinks. ICLR 2024.</li>
+    <li id="r5">Sun et al. Massive Activations in Large Language Models. COLM 2024.</li>
+  </ol>
+  <p class="small" id="n2">† Case-study numbers are measured on the well-calibrated checkpoint. The poorly calibrated one has the same defect in the same weights (input channels 1347 and 3917, median errors 422% and 139%), with 67 compensation rows in layer 4 instead of 86. The surprise in step 5 happens only on the well-calibrated checkpoint: on the poorly calibrated one, fix 1 alone already does the work (GSM8K-dev 74.0% → 94.9%) and fix 2 is neutral (93.6% with both, within noise).</p>
+  <p class="small" id="n1">* Both checkpoints use the same 3-bit format (8 levels per matrix, an FP8 scale per 32 weights). The poorly calibrated one was calibrated on a small, narrow set: 64 code files plus a few hundred model-generated reasoning traces and MMLU answers; the well-calibrated one on an equal mix of six domains (code, math answers, prose, chat, multilingual chat, knowledge questions). Neither calibration set overlaps the test sets.</p>
+  <footer>Code, data and every number: <a href="https://github.com/yahya010/llm-ptq" target="_blank" rel="noopener">github.com/yahya010/llm-ptq</a>. Draft.</footer>
+</section>
+<section class="col"><script src="https://utteranc.es/client.js" repo="abdelfattah-lab/abdelfattah-lab.github.io" issue-term="pathname" label="blog_comment" theme="preferred-color-scheme" crossorigin="anonymous" async></script></section>
+</div>
+
+<script src="data.js"></script>
+<script id="page-main">
+const D = window.WSP_DATA;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; }
+function press(ids, on) { ids.forEach(i => $(i).setAttribute("aria-pressed", i === on ? "true" : "false")); }
+function table(id, head, rows) { const t = $(id); t.innerHTML = ""; const h = t.insertRow(); head.forEach(x => { const c = document.createElement("th"); c.textContent = x; h.appendChild(c); });
+  rows.forEach(r => { const tr = t.insertRow(); if (r.cls) tr.className = r.cls; r.v.forEach(x => { tr.insertCell().textContent = x; }); }); }
+const f = v => (v < 20 ? v.toFixed(2) : v.toFixed(1));
+
+/* ---------- results ---------- */
+const BENCH = ["GSM8K", "MATH-500", "LiveCodeBench v6", "GPQA Diamond", "MMLU", "WikiText-2 PPL"];
+const NV = [95.0, 88.8, 55.2, 71.1, 77.1, 8.08];
+const POOR = [71.4, 60.8, 30.8, 47.1, 66.8, 11.76], POORE = [91.6, 82.2, 48.6, 62.6, 74.3, 9.39];
+const WELL = [91.6, 80.8, 39.2, 59.6, 67.2, 11.15], WELLE = [92.1, 84.6, 41.2, 63.0, 74.1, 8.87];
+function drawResults() {
+  table("results", ["Checkpoint", "Weights edited", ...BENCH], [
+    { v: ["NVFP4 release", "–", ...NV.map(f)], cls: "ref" },
+    { v: ["Poorly calibrated 3-bit", "–", ...POOR.map(f)] }, { v: ["+ agent edits", "0.0008%", ...POORE.map(f)], cls: "hi" },
+    { v: ["Well-calibrated 3-bit", "–", ...WELL.map(f)] }, { v: ["+ agent edits", "0.001%", ...WELLE.map(f)], cls: "hi" }]);
+  const s = $("gapbars"); s.innerHTML = ""; const x0 = 160, W = 640;
+  BENCH.forEach((b, i) => { const y = 6 + i * 28;
+    el("text", { x: 0, y: y + 14 }, s, b);
+    [[POOR, POORE, css("--fix")], [WELL, WELLE, css("--deep")]].forEach(([a, e, c], j) => {
+      const fr = Math.max(0, (e[i] - a[i]) / (NV[i] - a[i]));
+      el("rect", { x: x0, y: y + j * 11, width: W, height: 9, rx: 2, fill: css("--rule") }, s);
+      el("rect", { x: x0, y: y + j * 11, width: fr * W, height: 9, rx: 2, fill: c }, s);
+      el("text", { x: x0 + W + 8, y: y + j * 11 + 8.5, class: "t-ink" }, s, `${Math.round(fr * 100)}%`); }); });
+}
+
+/* ---------- capping ---------- */
+const CAPB = [["gsm8k", "GSM8K"], ["math500", "MATH-500"], ["lcb", "LiveCodeBench"], ["gpqa", "GPQA"]];
+function drawCaps(tag) {
+  const s = $("caps"); s.innerHTML = ""; const x0 = 140, sc = 30;
+  CAPB.forEach(([k, name], i) => { const c = D.caps[`${k}/${tag}`], y = 10 + i * 44;
+    el("text", { x: 0, y: y + 16 }, s, name);
+    let x = x0; const fi = c.finishing, b = c.better;
+    if (fi >= 0) { el("rect", { x, y, width: fi * sc, height: 22, rx: 3, fill: css("--muted") }, s); x += fi * sc + 2; } else el("rect", { x: x0 + fi * sc, y, width: -fi * sc, height: 22, rx: 3, fill: css("--muted") }, s);
+    el("rect", { x, y, width: Math.max(0, b) * sc, height: 22, rx: 3, fill: css("--fix") }, s);
+    el("text", { x: x + Math.max(0, b) * sc + 8, y: y + 16, class: "t-ink" }, s, `+${c.gain} = ${fi >= 0 ? "+" : ""}${fi} finishing + ${b} better answers`); });
+}
+
+
+$("cap-poor").onclick = () => { press(["cap-poor", "cap-well"], "cap-poor"); drawCaps("sh_c2"); };
+$("cap-well").onclick = () => { press(["cap-poor", "cap-well"], "cap-well"); drawCaps("wsp_c5"); };
+/* ---------- case study tables ---------- */
+const DS = D.discover;
+function drawTables() {
+  table("t-measure", ["KL to NVFP4", "chat math", "code", "prose"], [
+    { v: ["Well-calibrated 3-bit", DS.A.math.toFixed(3), DS.A.code.toFixed(3), DS.A.prose.toFixed(3)] },
+    { v: ["Poorly calibrated 3-bit", DS.A_sharar.math.toFixed(3), DS.A_sharar.code.toFixed(3), DS.A_sharar.prose.toFixed(3)] }]);
+  table("t-channels", ["Input channel", "energy vs median", "first 4 tokens vs later", "share of output error", "on first tokens", "weight error"],
+    DS.D.slice(0, 4).map(r => ({ v: [String(r.channel), `${Math.round(r.energy_vs_median).toLocaleString()}×`, `${Math.round(r.first4_vs_later).toLocaleString()}×`,
+      `${Math.round(r.share_of_output_error_all_tokens * 100)}%`, `${Math.round(r.share_of_output_error_first_tokens * 100)}%`, `${Math.round(r.weight_col_median_rel_err * 100)}%`], cls: r.channel === 1347 ? "hi" : "" })));
+  table("t-cgptq", ["Start", "Repair", "Weights edited", ...BENCH], [
+    { v: ["Poorly calibrated", "agent edits", "0.0008%", ...POORE.map(f)], cls: "hi" },
+    { v: ["Poorly calibrated", "constrained GPTQ", "0.0062%", ...[91.6, 81.8, 48.9, 63.3, 74.2, 9.35].map(f)] },
+    { v: ["Well-calibrated", "agent edits", "0.001%", ...WELLE.map(f)], cls: "hi" },
+    { v: ["Well-calibrated", "constrained GPTQ", "0.0055%", ...[92.6, 83.2, 43.0, 63.9, 73.9, 8.94].map(f)] }]);
+}
+function bars(svg, rows, x0, w) { const cols = [css("--muted"), css("--deep"), css("--fix")];
+  rows.forEach((r, i) => { const y = 4 + i * 32; el("text", { x: 0, y: y + 15 }, svg, r.label);
+    ["math", "code", "prose"].forEach((k, j) => { el("rect", { x: x0, y: y + j * 8, width: Math.max(0, r[k]) * w, height: 7, rx: 2, fill: cols[j] }, svg); });
+    el("text", { x: x0 + Math.max(r.math, r.code, r.prose, 0) * w + 6, y: y + 15, class: "t-ink" }, svg, `${Math.round(r.prose * 100)}%`); }); }
+function drawLocalize() { $("s1a").innerHTML = ""; $("s1b").innerHTML = "";
+  bars($("s1a"), Object.entries(DS.B).map(([k, v]) => ({ label: `${k.replace("routed ", "")} (${v.n})`, ...v })), 170, 240);
+  bars($("s1b"), DS.C.slice(0, 6).map(([L, v]) => ({ label: `layer ${L}`, ...v })), 90, 320); }
+
+/* ---------- grid widget ---------- */
+const LV = [-3.5, -2.25, -1.25, -0.40625, 0.40625, 1.25, 2.25, 3.5];
+const G = D.group, S0 = G.levels_broad[7] / 3.5, SINK = G.sink_col - G.group_cols[0], EDIT_M = G.levels_edit[7] / G.levels_broad[7];
+function nearest(w, s) { let b = LV[0] * s; for (const l of LV) if (Math.abs(l * s - w) < Math.abs(b - w)) b = l * s; return b; }
+function drawGrid(m) {
+  const svg = $("grid"); svg.innerHTML = ""; const s = S0 * m, lo = -0.03, hi = 0.042, X = v => 20 + (v - lo) / (hi - lo) * 860;
+  el("line", { x1: 20, x2: 880, y1: 150, y2: 150, stroke: css("--rule") }, svg);
+  [-0.02, -0.01, 0, 0.01, 0.02, 0.03, 0.04].forEach(v => el("text", { x: X(v), y: 182, "text-anchor": "middle" }, svg, v.toFixed(2)));
+  LV.forEach(l => { const x = X(l * s); if (x > 15 && x < 885) el("line", { x1: x, x2: x, y1: 22, y2: 150, stroke: css("--muted"), "stroke-width": 1.4 }, svg); });
+  el("text", { x: 20, y: 14 }, svg, "NVFP4 weight"); el("text", { x: 20, y: 166 }, svg, "stored");
+  let rest = 0, restN = 0;
+  G.exact.forEach((w, i) => { const q = nearest(w, s), sink = i === SINK, col = sink ? css("--fix") : css("--muted");
+    el("line", { x1: X(w), y1: 48, x2: X(q), y2: 142, stroke: col, "stroke-width": sink ? 2.4 : 1 }, svg);
+    el("circle", { cx: X(w), cy: 44, r: sink ? 6 : 4, fill: col }, svg); if (!sink) { rest += (q - w) ** 2; restN += w * w; } });
+  const w = G.exact[SINK], q = nearest(w, s), e = Math.abs(q - w) / Math.abs(w);
+  $("scale-lbl").textContent = m.toFixed(2); $("v-sink").textContent = w.toFixed(6);
+  $("v-sinkerr").textContent = `${q.toFixed(6)} · ${Math.round(e * 100)}%`;
+  $("v-contrib").textContent = `${(q * 50).toFixed(3)} vs ${(w * 50).toFixed(3)}`;
+  $("v-rest").textContent = `${Math.round(Math.sqrt(rest / restN) * 100)}% (relative)`;
+  $("ro-sinkerr").className = e > 0.5 ? "bad" : "good"; $("ro-contrib").className = e > 0.5 ? "bad" : "good"; $("ro-rest").className = Math.sqrt(rest / restN) > 0.6 ? "bad" : "";
+}
+$("scale").oninput = e => drawGrid(+e.target.value);
+$("sc-gptq").onclick = () => { $("scale").value = 1; drawGrid(1); };
+$("sc-edit").onclick = () => { $("scale").value = EDIT_M; drawGrid(EDIT_M); };
+
+/* ---------- chart helpers ---------- */
+function lineChart(svg, series, o) {
+  const { W = 860, H = 170, x0 = 50, ylog = false, xs, ymin, ymax, xlab } = o;
+  const Y = v => { const a = ylog ? Math.log10(v) : v, l = ylog ? Math.log10(ymin) : ymin, h = ylog ? Math.log10(ymax) : ymax; return 10 + (1 - (a - l) / (h - l)) * H; };
+  const X = i => x0 + i / (xs.length - 1) * (W - x0);
+  (ylog ? [ymin, Math.sqrt(ymin * ymax), ymax] : [ymin, (ymin + ymax) / 2, ymax]).forEach(v => { el("line", { x1: x0, x2: W, y1: Y(v), y2: Y(v), stroke: css("--rule") }, svg);
+    el("text", { x: x0 - 6, y: Y(v) + 4, "text-anchor": "end" }, svg, ylog ? (v >= 1 ? `${+v.toFixed(1)}×` : v.toExponential(0)) : v.toFixed(3)); });
+  xs.forEach((x, i) => { if (!o.xticks || o.xticks.includes(i)) el("text", { x: X(i), y: H + 26, "text-anchor": "middle" }, svg, x); });
+  if (xlab) el("text", { x: (x0 + W) / 2, y: H + 42, "text-anchor": "middle" }, svg, xlab);
+  series.forEach(s => { el("polyline", { points: s.v.map((v, i) => `${X(i)},${Y(Math.max(v, ymin))}`).join(" "), fill: "none", stroke: s.c, "stroke-width": 2, "stroke-dasharray": s.dash || "" }, svg);
+    if (s.label) el("text", { x: X(s.v.length - 1) + 4, y: Y(Math.max(s.v[s.v.length - 1], ymin)) + 4, class: "t-ink" }, svg, s.label); });
+  return Y;
+}
+function scatter(canvas, sets, lim) {
+  const c = canvas.getContext("2d"), n = canvas.width; c.clearRect(0, 0, n, n);
+  c.strokeStyle = css("--rule"); c.strokeRect(0.5, 0.5, n - 1, n - 1);
+  c.setLineDash([4, 3]); c.strokeStyle = css("--ink2"); c.beginPath(); c.moveTo(0, n); c.lineTo(n, 0); c.stroke(); c.setLineDash([]);
+  sets.forEach(([pts, col]) => { c.fillStyle = col; pts.forEach(([x, y]) => { if (Math.abs(x) < lim && Math.abs(y) < lim) c.fillRect((x / lim + 1) / 2 * n - 1.5, (1 - (y / lim + 1) / 2) * n - 1.5, 3, 3); }); });
+}
+
+/* ---------- scan ---------- */
+const CS = D.comp, CN = { "4": ["layer 4 (outlier channel)", "--fix"], "11": ["layer 11 (outlier channel)", "--deep"], "7": ["layer 7 (healthy)", "--muted"] };
+function drawScan(thr) {
+  const s = $("scan"); s.innerHTML = ""; const keys = ["4", "11", "7"], N = 400;
+  const Y = lineChart(s, keys.map(k => ({ v: CS[k].slice(0, N), c: css(CN[k][1]) })), { xs: [...Array(N).keys()].map(i => i + 1), ylog: true, ymin: 1, ymax: 15, W: 880, H: 200, xticks: [0, 99, 199, 299, 399], xlab: "rows of W, sorted" });
+  el("line", { x1: 50, x2: 880, y1: Y(thr), y2: Y(thr), stroke: css("--damage"), "stroke-dasharray": "5 4", "stroke-width": 1.5 }, s);
+  $("thr-lbl").textContent = thr.toFixed(1);
+  $("scan-ro").innerHTML = keys.map(k => `<div class="${k === "7" ? "" : "bad"}"><div class="k">${CN[k][0]}</div><div class="v num">${CS[k].filter(x => x > thr).length} rows</div></div>`).join("");
+}
+$("thr").oninput = e => drawScan(+e.target.value);
+
+/* ---------- matrix maps ---------- */
+const MX = D.matrix, [MH, MW] = MX.map_shape;
+const dec = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const ERRB = dec(MX.err_b), ERRE = dec(MX.err_e), EDITS = dec(MX.edits), HEAT = dec(MX.heat);
+const E2 = new Set(MX.edit2_rows), medE = [...MX.e_all].sort((a, b) => a - b)[MX.e_all.length >> 1];
+const rgb = h => { h = h.replace("#", ""); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
+const ramp = (t, a, b) => a.map((x, i) => Math.round(x + (b[i] - x) * t));
+function paint(id, mode) {
+  const c = $(id).getContext("2d"), img = c.createImageData(MW, MH), bg = rgb(css("--surface")), fx = rgb(css("--fix")), dp = rgb(css("--deep")), dm = rgb(css("--damage"));
+  for (let i = 0; i < MH * MW; i++) img.data.set([...(mode === "edits" ? (EDITS[i] === 1 ? fx : EDITS[i] === 2 ? dp : bg) : ramp((mode === "before" ? ERRB : ERRE)[i] / 255, bg, dm)), 255], i * 4);
+  c.putImageData(img, 0, 0);
+}
+function drawHeat() { const c = $("heat").getContext("2d"), [hh, hw] = MX.heat_shape, img = c.createImageData(hw, hh), bg = rgb(css("--surface")), dp = rgb(css("--deep"));
+  for (let i = 0; i < hh * hw; i++) img.data.set([...ramp(HEAT[i] / 255, bg, dp), 255], i * 4); c.putImageData(img, 0, 0); }
+function readout(box, row, both) {
+  const fe = v => v.toExponential(2), parts = [
+    ["input row of W", row == null ? "hover the map" : String(row), ""],
+    ["input energy vs median", row == null ? "–" : `${Math.round(MX.e_all[row] / medE).toLocaleString()}×`, ""],
+    ["share of the layer's output error from this row" + (both ? ", before" : ""), row == null ? "–" : `${(MX.rows_b[row] / MX.tot_b * 100).toFixed(1)}%`, "bad"]];
+  if (both) parts.push(["after fixes 1 + 2", row == null ? "–" : `${(MX.rows_e[row] / MX.tot_e * 100).toFixed(1)}%`, "good"],
+    ["edited", row == null ? "–" : row >= 1344 && row <= 1375 ? "fix 1 (outlier channel's groups)" : E2.has(row) ? "fix 2 (compensation row)" : "no", ""]);
+  box.innerHTML = parts.map(([k, v, c]) => `<div class="${c}"><div class="k">${k}</div><div class="v num">${v}</div></div>`).join("");
+}
+function hover(id, box, both) { $(id).addEventListener("mousemove", e => { const r = e.target.getBoundingClientRect(); readout(box, Math.min(MX.d_in - 1, Math.max(0, Math.floor((e.clientY - r.top) / r.height * MX.d_in))), both); }); }
+hover("map2", $("ro-map2"), true);
+let mapMode = "edits";
+function drawMap2() { paint("map2", mapMode);
+  $("map-legend").innerHTML = mapMode === "edits" ? `<span><i style="background:var(--fix)"></i>fix 1 (${MX.n_changed[0].toLocaleString()} weights)</span><span><i style="background:var(--deep)"></i>fix 2 (${MX.n_changed[1].toLocaleString()} weights)</span>`
+    : `<span><i style="background:var(--surface);border:1px solid var(--rule)"></i>low</span><span><i style="background:var(--damage)"></i>high output error (log, 6 decades)</span>`; }
+[["mv-edits", "edits"], ["mv-before", "before"], ["mv-after", "after"]].forEach(([id, m]) => $(id).onclick = () => { mapMode = m; press(["mv-edits", "mv-before", "mv-after"], id); drawMap2(); });
+$("m-tot").textContent = `${MX.tot_b.toFixed(2)} to ${MX.tot_e.toFixed(2)}`;
+
+/* ---------- KL by position ---------- */
+let kpMode = "math";
+function drawKL() { press(["kp-math", "kp-prose"], "kp-" + kpMode); const K = D.klpos, g = kpMode, keep = K[g + "_count"].map((n, i) => n >= 100 ? i : -1).filter(i => i >= 0);
+  const s = $("klpos"); s.innerHTML = ""; const pick = t => keep.map(i => K[`${g}_${t}`][i]);
+  lineChart(s, [{ v: pick("gptq_broad"), c: css("--muted"), label: "as quantized" }, { v: pick("wsp_e2"), c: css("--fix"), dash: "6 4", label: "+ fix 1" }, { v: pick("wsp_c2"), c: css("--deep"), label: "+ fixes 1, 2" }],
+    { xs: keep.map(i => `${K.buckets[i]}–${K.buckets[i + 1]}`), ymin: 0, ymax: Math.max(...pick("gptq_broad")) * 1.1, W: 760, xlab: "token position" }); }
+$("kp-math").onclick = () => { kpMode = "math"; drawKL(); }; $("kp-prose").onclick = () => { kpMode = "prose"; drawKL(); };
+
+function drawLoop() {
+  const s = $("loop"); s.innerHTML = "";
+  const boxes = [["Measure", "gap to NVFP4"], ["Localize", "put pieces back to NVFP4"], ["Read and edit", "weights and their inputs"], ["Keep or revert", "score on validation"]];
+  const w = 190, gap = 46, x0 = 10;
+  el("defs", {}, s).innerHTML = `<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${css("--ink2")}"/></marker>`;
+  boxes.forEach(([t, sub], i) => { const x = x0 + i * (w + gap), on = i === 2;
+    el("rect", { x, y: 14, width: w, height: 66, rx: 8, fill: on ? css("--fix-soft") : css("--bg"), stroke: on ? css("--fix") : css("--rule") }, s);
+    el("text", { x: x + w / 2, y: 42, "text-anchor": "middle", class: "t-ink", style: "font-family:var(--display);font-size:16px;font-weight:600" }, s, t);
+    el("text", { x: x + w / 2, y: 62, "text-anchor": "middle" }, s, sub);
+    if (i < 3) el("line", { x1: x + w + 4, x2: x + w + gap - 4, y1: 47, y2: 47, stroke: css("--ink2"), "stroke-width": 1.5, "marker-end": "url(#ah)" }, s); });
+  const xl = x0 + 3 * (w + gap) + w / 2, xf = x0 + w / 2;
+  el("path", { d: `M${xl},82 L${xl},120 L${xf},120 L${xf},86`, fill: "none", stroke: css("--ink2"), "stroke-width": 1.5, "marker-end": "url(#ah)" }, s);
+  el("text", { x: (xl + xf) / 2, y: 140, "text-anchor": "middle" }, s, "repeat until no edit helps");
+}
+function drawSkyline() {
+  const s = $("skyline"); s.innerHTML = ""; const e = MX.e_all, mx = Math.max(...e), x0 = 30, W = 860, H = 160;
+  el("line", { x1: x0, x2: x0 + W, y1: 10 + H, y2: 10 + H, stroke: css("--rule") }, s);
+  let d = ""; e.forEach((v, i) => { const x = x0 + i / e.length * W, h = v / mx * H; if (h > 0.05) d += `M${x.toFixed(1)},${(10 + H).toFixed(1)}V${(10 + H - h).toFixed(1)}`; });
+  el("path", { d, stroke: css("--muted"), "stroke-width": 1 }, s);
+  const xi = x0 + 1347 / e.length * W; el("line", { x1: xi, x2: xi, y1: 10 + H, y2: 10, stroke: css("--fix"), "stroke-width": 3 }, s);
+  el("text", { x: xi + 8, y: 24, class: "t-ink" }, s, "input 1347");
+  [0, 1024, 2048, 3072, 4095].forEach(v => el("text", { x: x0 + v / e.length * W, y: H + 28, "text-anchor": "middle" }, s, v));
+  el("text", { x: x0 + W / 2, y: H + 44, "text-anchor": "middle" }, s, "input channel");
+}
+function drawRowShare() {
+  const s = $("rowshare"); s.innerHTML = ""; const r = MX.rows_b, tot = MX.tot_b, x0 = 46, W = 840, H = 150, Y = v => 10 + (1 - v / 0.8) * H;
+  [0, 0.2, 0.4, 0.6, 0.8].forEach(v => { el("line", { x1: x0, x2: x0 + W, y1: Y(v), y2: Y(v), stroke: css("--rule") }, s); el("text", { x: x0 - 6, y: Y(v) + 4, "text-anchor": "end" }, s, `${v * 100}%`); });
+  let d = ""; r.forEach((v, i) => { const sh = v / tot; if (sh > 0.0005) d += `M${(x0 + i / r.length * W).toFixed(1)},${Y(0)}V${Y(sh).toFixed(1)}`; });
+  el("path", { d, stroke: css("--muted"), "stroke-width": 1.2 }, s);
+  const xi = x0 + 1347 / r.length * W; el("line", { x1: xi, x2: xi, y1: Y(0), y2: Y(r[1347] / tot), stroke: css("--damage"), "stroke-width": 3 }, s);
+  el("text", { x: xi + 8, y: Y(r[1347] / tot) + 12, class: "t-ink" }, s, `row 1347: ${Math.round(r[1347] / tot * 100)}% of the error`);
+  [0, 1024, 2048, 3072, 4095].forEach(v => el("text", { x: x0 + v / r.length * W, y: H + 28, "text-anchor": "middle" }, s, v));
+  el("text", { x: x0 + W / 2, y: H + 44, "text-anchor": "middle" }, s, "row of W (input channel)");
+  s.onmousemove = e => { const b = s.getBoundingClientRect(), vx = (e.clientX - b.left) / b.width * 900, row = Math.round((vx - x0) / W * r.length);
+    if (row < 0 || row >= r.length) return; $("rowshare-ro").textContent = `row ${row}: ${(r[row] / tot * 100).toFixed(2)}% of the layer's output error · input energy ${Math.round(MX.e_all[row] / medE).toLocaleString()}× median`; };
+}
+function drawAll() {
+  drawLoop();
+  drawResults(); drawCaps($("cap-well").getAttribute("aria-pressed") === "true" ? "wsp_c5" : "sh_c2"); drawTables(); drawLocalize();
+  drawRowShare(); drawGrid(+$("scale").value); drawScan(+$("thr").value);
+  scatter($("sinksc"), [[D.sink_scatter.before, css("--muted")], [D.sink_scatter.after, css("--fix")]], 0.006);
+  scatter($("comp"), [[D.comp_scatter.before, css("--muted")], [D.comp_scatter.after, css("--fix")]], 0.2);
+  drawMap2(); readout($("ro-map2"), 1347, true); drawKL();
+}
+
+drawAll();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawAll);
+new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+</body>
+</html>
