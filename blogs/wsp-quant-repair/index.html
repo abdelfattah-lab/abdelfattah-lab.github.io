@@ -171,7 +171,7 @@ img.th-dark { display: none; }
 <section class="col">
   <div class="kicker">Case study</div>
   <h2 style="margin-top:.4rem">How the agent found the defect, and how it fixed it</h2>
-  <p>Everything here was done by reading tensors and printing numbers in a Python session. We follow the agent on the well-calibrated checkpoint. The defect sits in the same weights in both checkpoints, and the same fixes repair both.</p>
+  <p>Everything here was done by reading tensors and printing numbers in a Python session. We follow the agent's fixes on the well-calibrated checkpoint.</p>
 
   <h3>1. Measure</h3>
   <p>Both models read the same held-out text, and at every token we compare their next-token distributions (KL divergence).</p>
@@ -209,16 +209,8 @@ img.th-dark { display: none; }
   <div class="fig-note">Mean |<i>x</i>| over 29 sequences, first 64 tokens, channels pooled by 16 (max), log scale. The one spike is channel 1347 on tokens 1–3, at 20–60; every other channel stays below 2, and a typical one below 0.01.</div>
 </div></section>
 <section class="col">
-  <p>Energy matters because a weight's rounding error only becomes output error when it is multiplied by its input. A weight that is off by 0.002 adds 0.002 × 0.005 = 0.00001 to an output when its channel holds a typical value, and 0.002 × 60 = 0.12 when it is channel 1347 on token 2. So the agent scored each row of <i>W</i> by how much output error it causes: the squared rounding error of its weights times its channel's energy. One row carries most of it.</p>
-</section>
-<section class="wide"><div class="fig">
-  <div class="fig-title">Which rows of <i>W</i> cause this layer's output error</div>
-  <svg id="rowshare" viewBox="0 0 900 200" style="width:100%;height:auto;margin-top:6px;cursor:crosshair" role="img" aria-label="Share of the layer's output error caused by each row of W; row 1347 causes 71%"></svg>
-  <div class="small num" id="rowshare-ro" style="min-height:1.4em"></div>
-  <div class="fig-note">One bar per row of <i>W</i> (one input channel): the share of this layer's output error caused by that row's weights, i.e. their squared rounding error times the channel's input energy. Hover to read any row.</div>
-</div></section>
-<section class="col">
-  <div class="scroll"><table id="t-channels"></table></div>
+  <p>Energy matters because a weight's rounding error only becomes output error when it is multiplied by its input. A weight that is off by 0.002 adds 0.002 × 0.005 = 0.00001 to an output when its channel holds a typical value, and 0.002 × 60 = 0.12 when it is channel 1347 on token 2. So the agent scored each row of <i>W</i> by how much output error it causes: the squared rounding error of its weights times its channel's energy. Row 1347 alone causes 71% of this layer's output error; the next largest row causes 6%.</p>
+
   <p>Channel 1347 is 20–60 on the first three tokens of every sequence and about 0.01 afterwards, like every other channel. Language models often keep a few such channels, huge on the first tokens and silent after; in attention models such channels are known as attention sinks<sup><a href="#r4">4</a></sup> or massive activations<sup><a href="#r5">5</a></sup>. We call it the outlier channel. The model needs it; the problem is the row of weights that multiplies it.</p>
 
   <h3>4. Zoom into the outlier row</h3>
@@ -425,9 +417,6 @@ function drawTables() {
   table("t-measure", ["KL to NVFP4", "chat math", "code", "prose"], [
     { v: ["Well-calibrated 3-bit", DS.A.math.toFixed(3), DS.A.code.toFixed(3), DS.A.prose.toFixed(3)] },
     { v: ["Poorly calibrated 3-bit", DS.A_sharar.math.toFixed(3), DS.A_sharar.code.toFixed(3), DS.A_sharar.prose.toFixed(3)] }]);
-  table("t-channels", ["Input channel", "energy vs median", "first 4 tokens vs later", "share of output error", "on first tokens", "weight error"],
-    DS.D.slice(0, 4).map(r => ({ v: [String(r.channel), `${Math.round(r.energy_vs_median).toLocaleString()}×`, `${Math.round(r.first4_vs_later).toLocaleString()}×`,
-      `${Math.round(r.share_of_output_error_all_tokens * 100)}%`, `${Math.round(r.share_of_output_error_first_tokens * 100)}%`, `${Math.round(r.weight_col_median_rel_err * 100)}%`], cls: r.channel === 1347 ? "hi" : "" })));
   table("t-cgptq", ["Start", "Repair", "Weights edited", ...BENCH], [
     { v: ["Poorly calibrated", "agent edits", "0.0008%", ...POORE.map(f)], cls: "hi" },
     { v: ["Poorly calibrated", "constrained GPTQ", "0.0062%", ...[91.6, 81.8, 48.9, 63.3, 74.2, 9.35].map(f)] },
@@ -575,22 +564,10 @@ function drawSkyline() {
   [0, 1024, 2048, 3072, 4095].forEach(v => el("text", { x: x0 + v / e.length * W, y: H + 28, "text-anchor": "middle" }, s, v));
   el("text", { x: x0 + W / 2, y: H + 44, "text-anchor": "middle" }, s, "input channel");
 }
-function drawRowShare() {
-  const s = $("rowshare"); s.innerHTML = ""; const r = MX.rows_b, tot = MX.tot_b, x0 = 46, W = 840, H = 150, Y = v => 10 + (1 - v / 0.8) * H;
-  [0, 0.2, 0.4, 0.6, 0.8].forEach(v => { el("line", { x1: x0, x2: x0 + W, y1: Y(v), y2: Y(v), stroke: css("--rule") }, s); el("text", { x: x0 - 6, y: Y(v) + 4, "text-anchor": "end" }, s, `${v * 100}%`); });
-  let d = ""; r.forEach((v, i) => { const sh = v / tot; if (sh > 0.0005) d += `M${(x0 + i / r.length * W).toFixed(1)},${Y(0)}V${Y(sh).toFixed(1)}`; });
-  el("path", { d, stroke: css("--muted"), "stroke-width": 1.2 }, s);
-  const xi = x0 + 1347 / r.length * W; el("line", { x1: xi, x2: xi, y1: Y(0), y2: Y(r[1347] / tot), stroke: css("--damage"), "stroke-width": 3 }, s);
-  el("text", { x: xi + 8, y: Y(r[1347] / tot) + 12, class: "t-ink" }, s, `row 1347: ${Math.round(r[1347] / tot * 100)}% of the error`);
-  [0, 1024, 2048, 3072, 4095].forEach(v => el("text", { x: x0 + v / r.length * W, y: H + 28, "text-anchor": "middle" }, s, v));
-  el("text", { x: x0 + W / 2, y: H + 44, "text-anchor": "middle" }, s, "row of W (input channel)");
-  s.onmousemove = e => { const b = s.getBoundingClientRect(), vx = (e.clientX - b.left) / b.width * 900, row = Math.round((vx - x0) / W * r.length);
-    if (row < 0 || row >= r.length) return; $("rowshare-ro").textContent = `row ${row}: ${(r[row] / tot * 100).toFixed(2)}% of the layer's output error · input energy ${Math.round(MX.e_all[row] / medE).toLocaleString()}× median`; };
-}
 function drawAll() {
   drawLoop();
   drawResults(); drawCaps($("cap-well").getAttribute("aria-pressed") === "true" ? "wsp_c5" : "sh_c2"); drawTables(); drawLocalize();
-  drawRowShare(); drawGrid(+$("scale").value); drawScan(+$("thr").value);
+  drawGrid(+$("scale").value); drawScan(+$("thr").value);
   scatter($("sinksc"), [[D.sink_scatter.before, css("--muted")], [D.sink_scatter.after, css("--fix")]], 0.006);
   scatter($("comp"), [[D.comp_scatter.before, css("--muted")], [D.comp_scatter.after, css("--fix")]], 0.2);
   drawMap2(); readout($("ro-map2"), 1347, true); drawKL();
