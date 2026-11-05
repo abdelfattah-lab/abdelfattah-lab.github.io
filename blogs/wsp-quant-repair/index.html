@@ -150,9 +150,6 @@ img.th-dark { display: none; }
 <section class="wide">
   <div class="fig">
     <div class="scroll"><table id="results"></table></div>
-    <div class="fig-title" style="margin-top:16px">Share of the gap to NVFP4 closed by the agent edits</div>
-    <svg id="gapbars" viewBox="0 0 900 175" style="width:100%;height:auto;margin-top:6px"></svg>
-    <div class="legend"><span><i style="background:var(--fix)"></i>poorly calibrated + agent edits</span><span><i style="background:var(--deep)"></i>well-calibrated + agent edits</span></div>
     <div class="fig-note">GSM8K and MATH-500 greedy, thinking off. LiveCodeBench (131 problems from 2025-02 on) and GPQA Diamond: thinking on, 3 and 4 samples, 32K tokens. MMLU 0-shot. WikiText-2 perplexity, lower is better. 3-bit weights dequantized to BF16 in vLLM, one GPU (GSM8K on quantized checkpoints shifted with the number of GPUs, 84.3% on two vs 93.1% on one for the same checkpoint, so every number here uses one).</div>
   </div>
 </section>
@@ -397,14 +394,6 @@ function drawResults() {
     { v: ["NVFP4 release", "–", ...NV.map(f)], cls: "ref" },
     { v: ["Poorly calibrated 3-bit", "–", ...POOR.map(f)] }, { v: ["+ agent edits", "0.0008%", ...POORE.map(f)], cls: "hi" },
     { v: ["Well-calibrated 3-bit", "–", ...WELL.map(f)] }, { v: ["+ agent edits", "0.001%", ...WELLE.map(f)], cls: "hi" }]);
-  const s = $("gapbars"); s.innerHTML = ""; const x0 = 160, W = 640;
-  BENCH.forEach((b, i) => { const y = 6 + i * 28;
-    el("text", { x: 0, y: y + 14 }, s, b);
-    [[POOR, POORE, css("--fix")], [WELL, WELLE, css("--deep")]].forEach(([a, e, c], j) => {
-      const fr = Math.max(0, (e[i] - a[i]) / (NV[i] - a[i]));
-      el("rect", { x: x0, y: y + j * 11, width: W, height: 9, rx: 2, fill: css("--rule") }, s);
-      el("rect", { x: x0, y: y + j * 11, width: fr * W, height: 9, rx: 2, fill: c }, s);
-      el("text", { x: x0 + W + 8, y: y + j * 11 + 8.5, class: "t-ink" }, s, `${Math.round(fr * 100)}%`); }); });
 }
 
 /* ---------- capping ---------- */
