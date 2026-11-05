@@ -267,7 +267,7 @@ img.th-dark { display: none; }
 </div></section>
 <section class="col">
   <p>The agent found these rows without data. It rounded every row of <i>W</i> to nearest under the scales already stored and compared: in a normal row GPTQ's weights are about 1.1× as far from the true weights as plain rounding; in this matrix 86 rows were 3–14× as far.</p>
-  <p><b>Fix 2:</b> re-round those 86 rows to nearest, keeping their scales. No data goes in. With both fixes, GSM8K-dev rose to 94.7%.</p>
+  <p><b>Fix 2:</b> for those 86 rows, throw away GPTQ's codes and store each weight as the 3-bit value closest to its NVFP4 weight (plain round-to-nearest), keeping the scales. The other rows keep GPTQ's codes. No data goes in. Like fix 1, it only rewrites existing codes, so the checkpoint's size and speed are unchanged. With both fixes, GSM8K-dev rose to 94.7%.</p>
 
   <h3>7. What changed in the matrix</h3>
 </section>
