@@ -216,11 +216,9 @@ img.th-dark { display: none; }
 </section>
 <section class="wide"><div class="fig">
   <div class="fig-title">One real group: inputs 1344–1375 feeding output 101</div>
-  <p class="small" style="margin:.3rem 0 0">Dots are the 32 NVFP4 weights; ticks are the 8 values the group can store; lines show where nearest rounding sends each weight. Blue is the outlier channel's weight, <i>W</i><sub>1347, 101</sub> = 0.000496. Drag the group scale.</p>
+  <p class="small" style="margin:.3rem 0 0">Dots are the 32 NVFP4 weights; ticks are the 8 values the group can store; lines show where nearest rounding sends each weight. Blue is the outlier channel's weight, <i>W</i><sub>1347, 101</sub> = 0.000496. Plays when it scrolls into view: the group scale shrinks from the quantized checkpoint's to fix 1's.</p>
   <svg id="grid" viewBox="0 0 900 190" role="img" aria-label="Weights of one group and the 8 storable values" style="width:100%;height:auto;margin-top:8px"></svg>
-  <label for="scale" class="small">Group scale: <span id="scale-lbl" class="num"></span> × the quantized checkpoint's</label>
-  <input type="range" id="scale" min="0.12" max="1.2" step="0.005" value="1">
-  <div class="controls"><button class="seg" id="sc-gptq">As quantized (1×)</button><button class="seg" id="sc-edit">Fix 1: store this weight exactly</button></div>
+  <div class="small num" id="grid-stage" style="min-height:1.5em"></div>
   <div class="readout">
     <div><div class="k">this weight, NVFP4</div><div class="v num" id="v-sink"></div></div>
     <div id="ro-sinkerr"><div class="k">stored as / error</div><div class="v num" id="v-sinkerr"></div></div>
@@ -247,7 +245,7 @@ img.th-dark { display: none; }
     <tr class="hi"><td>Fix 1</td><td>0.0012</td><td>±0.0005 ±0.0015 ±0.0027 ±0.0042</td><td>0.000486 (2% off)</td><td>0.0042 (clipped)</td><td>0.07 × 10⁻⁴</td></tr>
     </tbody></table></div>
   <p class="small">Group error: each weight's squared error times its channel's input energy, summed over the 32 weights.</p>
-  <p><b>The price.</b> With the smaller scale, the largest value the group can store falls from 0.0223 to 0.0042, so 27 of the other 31 weights clip. Those weights are now much worse, yet the group's error falls 18×, because their channels' inputs are tiny: as quantized, 82% of the group's error came from channel 1347 alone. Press "Fix 1: store this weight exactly" on the figure above to watch the levels shrink and the large weights pile up at the edges.</p>
+  <p><b>The price.</b> With the smaller scale, the largest value the group can store falls from 0.0223 to 0.0042, so 27 of the other 31 weights clip. Those weights are now much worse, yet the group's error falls 18×, because their channels' inputs are tiny: as quantized, 82% of the group's error came from channel 1347 alone. The figure above plays this change: the levels shrink until one sits on the blue weight, and the large weights pile up at the edges.</p>
   <p><b>Across the matrix.</b> The same rule runs once per output: for each of the 2,688 outputs, it rewrites one scale (the group holding input 1347) and re-rounds the 32 codes under it. That is 2,688 scales and 85,286 changed codes. Only the NVFP4 weights, the 8 levels and the scale format go in; no data. Across all 2,688 outputs, the outlier channel's median weight error drops from 422% to under 2%.</p>
 </section>
 <section class="col"><div class="fig">
@@ -444,15 +442,25 @@ function drawGrid(m) {
     el("line", { x1: X(w), y1: 48, x2: X(q), y2: 142, stroke: col, "stroke-width": sink ? 2.4 : 1 }, svg);
     el("circle", { cx: X(w), cy: 44, r: sink ? 6 : 4, fill: col }, svg); if (!sink) { rest += (q - w) ** 2; restN += w * w; } });
   const w = G.exact[SINK], q = nearest(w, s), e = Math.abs(q - w) / Math.abs(w);
-  $("scale-lbl").textContent = m.toFixed(2); $("v-sink").textContent = w.toFixed(6);
+  const t = (1 - m) / (1 - EDIT_M);
+  $("grid-stage").textContent = t < 0.02 ? "As quantized · group scale 1.00×" : t > 0.98 ? `Fix 1 · group scale ${m.toFixed(2)}×: the blue weight is stored exactly` : `Shrinking the group scale · ${m.toFixed(2)}×`;
+  $("v-sink").textContent = w.toFixed(6);
   $("v-sinkerr").textContent = `${q.toFixed(6)} · ${Math.round(e * 100)}%`;
   $("v-contrib").textContent = `${(q * 50).toFixed(3)} vs ${(w * 50).toFixed(3)}`;
   $("v-rest").textContent = `${Math.round(Math.sqrt(rest / restN) * 100)}% (relative)`;
   $("ro-sinkerr").className = e > 0.5 ? "bad" : "good"; $("ro-contrib").className = e > 0.5 ? "bad" : "good"; $("ro-rest").className = Math.sqrt(rest / restN) > 0.6 ? "bad" : "";
 }
-$("scale").oninput = e => drawGrid(+e.target.value);
-$("sc-gptq").onclick = () => { $("scale").value = 1; drawGrid(1); };
-$("sc-edit").onclick = () => { $("scale").value = EDIT_M; drawGrid(EDIT_M); };
+let gridM = 1, gridRun = 0;
+function playGrid() {  // hold the quantized state, then shrink the scale to fix 1's; replays on each scroll into view
+  const run = ++gridRun; gridM = 1; drawGrid(1);
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches, t0 = performance.now() + 1200, dur = 2600;
+  const step = now => { if (run !== gridRun) return;
+    const u = Math.min(1, Math.max(0, (now - t0) / dur)), e = still ? (u > 0 ? 1 : 0) : u * u * (3 - 2 * u);
+    gridM = Math.exp(Math.log(EDIT_M) * e); drawGrid(gridM); if (u < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+new IntersectionObserver(es => es.forEach(en => { if (en.intersectionRatio >= 0.6) { if (gridM === 1) playGrid(); } else if (!en.isIntersecting) { gridRun++; gridM = 1; drawGrid(1); } }),
+  { threshold: [0, 0.6] }).observe($("grid"));
 
 /* ---------- chart helpers ---------- */
 function lineChart(svg, series, o) {
@@ -565,7 +573,7 @@ function drawSkyline() {
 function drawAll() {
   drawLoop();
   drawResults(); drawCaps($("cap-well").getAttribute("aria-pressed") === "true" ? "wsp_c5" : "sh_c2"); drawTables(); drawLocalize();
-  drawGrid(+$("scale").value); drawScan(+$("thr").value);
+  drawGrid(gridM); drawScan(+$("thr").value);
   scatter($("sinksc"), [[D.sink_scatter.before, css("--muted")], [D.sink_scatter.after, css("--fix")]], 0.006);
   scatter($("comp"), [[D.comp_scatter.before, css("--muted")], [D.comp_scatter.after, css("--fix")]], 0.2);
   drawMap2(); readout($("ro-map2"), 1347, true); drawKL();
