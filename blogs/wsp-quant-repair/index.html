@@ -163,8 +163,8 @@ img.th-dark { display: none; }
       <button class="seg" id="cap-poor" aria-pressed="true">Poorly calibrated + agent edits</button>
       <button class="seg" id="cap-well" aria-pressed="false">Well-calibrated + agent edits</button>
     </div>
-    <svg id="caps" viewBox="0 0 900 190" style="width:100%;height:auto" role="img" aria-label="Gain split into finishing and better answers"></svg>
-    <div class="legend"><span><i style="background:var(--muted)"></i>from finishing more often</span><span><i style="background:var(--fix)"></i>from better finished answers</span></div>
+    <svg id="caps" viewBox="0 0 900 280" style="width:100%;height:auto" role="img" aria-label="Gain split into finishing and better answers"></svg>
+    <div class="legend"><span><i style="background:var(--muted)"></i>from finishing within the token limit</span><span><i style="background:var(--fix)"></i>from better answers</span></div>
   </div>
 </section>
 
@@ -399,13 +399,21 @@ function drawResults() {
 /* ---------- capping ---------- */
 const CAPB = [["gsm8k", "GSM8K"], ["math500", "MATH-500"], ["lcb", "LiveCodeBench"], ["gpqa", "GPQA"]];
 function drawCaps(tag) {
-  const s = $("caps"); s.innerHTML = ""; const x0 = 140, sc = 30;
-  CAPB.forEach(([k, name], i) => { const c = D.caps[`${k}/${tag}`], y = 10 + i * 44;
-    el("text", { x: 0, y: y + 16 }, s, name);
-    let x = x0; const fi = c.finishing, b = c.better;
-    if (fi >= 0) { el("rect", { x, y, width: fi * sc, height: 22, rx: 3, fill: css("--muted") }, s); x += fi * sc + 2; } else el("rect", { x: x0 + fi * sc, y, width: -fi * sc, height: 22, rx: 3, fill: css("--muted") }, s);
-    el("rect", { x, y, width: Math.max(0, b) * sc, height: 22, rx: 3, fill: css("--fix") }, s);
-    el("text", { x: x + Math.max(0, b) * sc + 8, y: y + 16, class: "t-ink" }, s, `+${c.gain} = ${fi >= 0 ? "+" : ""}${fi} finishing + ${b} better answers`); });
+  const s = $("caps"); s.innerHTML = "";
+  const rows = CAPB.map(([k, name]) => ({ name, ...D.caps[`${k}/${tag}`] })), vals = rows.flatMap(r => [r.finishing, r.better]);
+  const step = Math.max(...vals) > 10 ? 5 : 1, hi = Math.ceil(Math.max(...vals) / step) * step, lo = Math.min(0, Math.floor(Math.min(...vals) / step) * step);
+  const L = 64, R = 890, T = 30, B = 230, Y = v => T + (hi - v) / (hi - lo) * (B - T), sgn = v => (v > 0 ? "+" : "") + v.toFixed(1);
+  el("text", { x: 0, y: 12 }, s, "accuracy points gained");
+  for (let v = lo; v <= hi + 1e-9; v += step) {
+    el("line", { x1: L, x2: R, y1: Y(v), y2: Y(v), stroke: v === 0 ? css("--ink2") : css("--rule"), "stroke-width": 1 }, s);
+    el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end" }, s, v === 0 ? "0" : (v > 0 ? "+" : "") + v); }
+  const gw = (R - L) / rows.length, bw = 64;
+  rows.forEach((r, i) => { const cx = L + gw * (i + 0.5);
+    [[r.finishing, css("--muted"), cx - bw - 3], [r.better, css("--fix"), cx + 3]].forEach(([v, col, x]) => {
+      el("rect", { x, y: Y(Math.max(v, 0)), width: bw, height: Math.max(1, Math.abs(Y(v) - Y(0))), rx: 3, fill: col }, s);
+      el("text", { x: x + bw / 2, y: v >= 0 ? Y(v) - 6 : Y(v) + 14, "text-anchor": "middle", class: "t-ink" }, s, sgn(v)); });
+    el("text", { x: cx, y: B + 22, "text-anchor": "middle", class: "t-ink" }, s, r.name);
+    el("text", { x: cx, y: B + 40, "text-anchor": "middle" }, s, `total ${sgn(r.gain)}`); });
 }
 
 
