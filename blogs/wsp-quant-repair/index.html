@@ -274,26 +274,13 @@ img.th-dark { display: none; }
 <section class="wide"><div class="fig">
   <div class="fig-title">Output error per weight of <i>W</i>, before and after the fixes</div>
   <img class="th-light" src="img/surface_err_light.png" alt="3D surfaces of per-weight output error before and after; a wall at row 1347 disappears after the fixes" style="width:100%;height:auto;display:block"><img class="th-dark" src="img/surface_err_dark.png" alt="3D surfaces of per-weight output error before and after; a wall at row 1347 disappears after the fixes" style="width:100%;height:auto">
-  <div class="fig-note">Each weight's squared rounding error times its input channel's energy, pooled 16 × 16, log scale, same axes in both panels. As quantized, row 1347 is a wall across all 2,688 outputs; after fixes 1 and 2 it is gone, and what remains is ordinary rounding noise.</div>
-</div></section>
-<section class="col"><p>Which weights were edited, and the same error as a map you can hover:</p></section>
-<section class="wide"><div class="fig">
-  <div class="controls" role="group" aria-label="Matrix view">
-    <button class="seg" id="mv-edits" aria-pressed="true">Weights edited</button>
-    <button class="seg" id="mv-before" aria-pressed="false">Error before</button>
-    <button class="seg" id="mv-after" aria-pressed="false">Error after</button>
-  </div>
-  <div class="mapgrid">
-    <div style="min-width:0"><canvas id="map2" width="336" height="512" style="width:100%;aspect-ratio:336/512;cursor:crosshair" aria-label="Weight matrix: edits and error"></canvas><div class="legend" id="map-legend"></div></div>
-    <div style="min-width:0"><div class="readout" style="grid-template-columns:1fr" id="ro-map2"></div>
-      <p class="small">The matrix's output error falls from <span class="num" id="m-tot">0.83 to 0.11</span>. What remains at rows 1344–1375 is fix 1's cost, the clipped neighbours.</p></div>
-  </div>
-  <div class="fig-note">Fix 1 is one band of rows, 1344–1375 (the 32-wide groups holding input 1347), across all 2,688 outputs. Fix 2 is 86 single rows, mostly between 3,100 and 4,095. Together: 261,698 of 11 million weights, 2.4% of this matrix.</div>
+  <div class="fig-note">Each weight's squared rounding error times its input channel's energy, pooled 16 × 16, log scale, same axes in both panels. As quantized, row 1347 is a wall across all 2,688 outputs; after fixes 1 and 2 it is gone, and what remains is ordinary rounding noise. The matrix's total output error falls from 0.83 to 0.11.</div>
 </div></section>
 <section class="wide"><div class="fig">
   <div class="fig-title">KL to NVFP4 by token position</div>
   <div class="controls"><button class="seg" id="kp-math" aria-pressed="true">chat math</button><button class="seg" id="kp-prose" aria-pressed="false">prose</button></div>
   <svg id="klpos" viewBox="0 0 900 225" style="width:100%;height:auto"></svg>
+  <div class="legend"><span><i style="background:var(--muted)"></i>as quantized</span><span><i style="background:var(--fix)"></i>+ fix 1 (dashed)</span><span><i style="background:var(--deep)"></i>+ fixes 1 and 2</span></div>
   <div class="fig-note">Fix 1 repairs the start of the sequence. On chat math, fix 2 brings KL down at every position, because the bent rows added error on every token.</div>
 </div></section>
 <section class="col">
@@ -472,46 +459,13 @@ function scatter(canvas, sets, lim) {
   c.restore();
 }
 
-/* ---------- scan ---------- */
-
-/* ---------- matrix maps ---------- */
-const MX = D.matrix, [MH, MW] = MX.map_shape;
-const dec = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-const ERRB = dec(MX.err_b), ERRE = dec(MX.err_e), EDITS = dec(MX.edits), HEAT = dec(MX.heat);
-const E2 = new Set(MX.edit2_rows), medE = [...MX.e_all].sort((a, b) => a - b)[MX.e_all.length >> 1];
-const rgb = h => { h = h.replace("#", ""); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
-const ramp = (t, a, b) => a.map((x, i) => Math.round(x + (b[i] - x) * t));
-function paint(id, mode) {
-  const c = $(id).getContext("2d"), img = c.createImageData(MW, MH), bg = rgb(css("--surface")), fx = rgb(css("--fix")), dp = rgb(css("--deep")), dm = rgb(css("--damage"));
-  for (let i = 0; i < MH * MW; i++) img.data.set([...(mode === "edits" ? (EDITS[i] === 1 ? fx : EDITS[i] === 2 ? dp : bg) : ramp((mode === "before" ? ERRB : ERRE)[i] / 255, bg, dm)), 255], i * 4);
-  c.putImageData(img, 0, 0);
-}
-function drawHeat() { const c = $("heat").getContext("2d"), [hh, hw] = MX.heat_shape, img = c.createImageData(hw, hh), bg = rgb(css("--surface")), dp = rgb(css("--deep"));
-  for (let i = 0; i < hh * hw; i++) img.data.set([...ramp(HEAT[i] / 255, bg, dp), 255], i * 4); c.putImageData(img, 0, 0); }
-function readout(box, row, both) {
-  const fe = v => v.toExponential(2), parts = [
-    ["input row of W", row == null ? "hover the map" : String(row), ""],
-    ["input energy vs median", row == null ? "–" : `${Math.round(MX.e_all[row] / medE).toLocaleString()}×`, ""],
-    ["share of the layer's output error from this row" + (both ? ", before" : ""), row == null ? "–" : `${(MX.rows_b[row] / MX.tot_b * 100).toFixed(1)}%`, "bad"]];
-  if (both) parts.push(["after fixes 1 + 2", row == null ? "–" : `${(MX.rows_e[row] / MX.tot_e * 100).toFixed(1)}%`, "good"],
-    ["edited", row == null ? "–" : row >= 1344 && row <= 1375 ? "fix 1 (outlier channel's groups)" : E2.has(row) ? "fix 2 (compensation row)" : "no", ""]);
-  box.innerHTML = parts.map(([k, v, c]) => `<div class="${c}"><div class="k">${k}</div><div class="v num">${v}</div></div>`).join("");
-}
-function hover(id, box, both) { $(id).addEventListener("mousemove", e => { const r = e.target.getBoundingClientRect(); readout(box, Math.min(MX.d_in - 1, Math.max(0, Math.floor((e.clientY - r.top) / r.height * MX.d_in))), both); }); }
-hover("map2", $("ro-map2"), true);
-let mapMode = "edits";
-function drawMap2() { paint("map2", mapMode);
-  $("map-legend").innerHTML = mapMode === "edits" ? `<span><i style="background:var(--fix)"></i>fix 1 (${MX.n_changed[0].toLocaleString()} weights)</span><span><i style="background:var(--deep)"></i>fix 2 (${MX.n_changed[1].toLocaleString()} weights)</span>`
-    : `<span><i style="background:var(--surface);border:1px solid var(--rule)"></i>low</span><span><i style="background:var(--damage)"></i>high output error (log, 6 decades)</span>`; }
-[["mv-edits", "edits"], ["mv-before", "before"], ["mv-after", "after"]].forEach(([id, m]) => $(id).onclick = () => { mapMode = m; press(["mv-edits", "mv-before", "mv-after"], id); drawMap2(); });
-$("m-tot").textContent = `${MX.tot_b.toFixed(2)} to ${MX.tot_e.toFixed(2)}`;
 
 /* ---------- KL by position ---------- */
 let kpMode = "math";
 function drawKL() { press(["kp-math", "kp-prose"], "kp-" + kpMode); const K = D.klpos, g = kpMode, keep = K[g + "_count"].map((n, i) => n >= 100 ? i : -1).filter(i => i >= 0);
   const s = $("klpos"); s.innerHTML = ""; const pick = t => keep.map(i => K[`${g}_${t}`][i]);
-  lineChart(s, [{ v: pick("gptq_broad"), c: css("--muted"), label: "as quantized" }, { v: pick("wsp_e2"), c: css("--fix"), dash: "6 4", label: "+ fix 1" }, { v: pick("wsp_c2"), c: css("--deep"), label: "+ fixes 1, 2" }],
-    { xs: keep.map(i => `${K.buckets[i]}–${K.buckets[i + 1]}`), ymin: 0, ymax: Math.max(...pick("gptq_broad")) * 1.1, W: 760, xlab: "token position" }); }
+  lineChart(s, [{ v: pick("gptq_broad"), c: css("--muted") }, { v: pick("wsp_e2"), c: css("--fix"), dash: "6 4" }, { v: pick("wsp_c2"), c: css("--deep") }],
+    { xs: keep.map(i => `${K.buckets[i]}–${K.buckets[i + 1]}`), ymin: 0, ymax: Math.max(...pick("gptq_broad")) * 1.1, W: 880, xlab: "token position" }); }
 $("kp-math").onclick = () => { kpMode = "math"; drawKL(); }; $("kp-prose").onclick = () => { kpMode = "prose"; drawKL(); };
 
 function drawLoop() {
@@ -528,23 +482,13 @@ function drawLoop() {
   el("path", { d: `M${xl},82 L${xl},120 L${xf},120 L${xf},86`, fill: "none", stroke: css("--ink2"), "stroke-width": 1.5, "marker-end": "url(#ah)" }, s);
   el("text", { x: (xl + xf) / 2, y: 140, "text-anchor": "middle" }, s, "repeat until no edit helps");
 }
-function drawSkyline() {
-  const s = $("skyline"); s.innerHTML = ""; const e = MX.e_all, mx = Math.max(...e), x0 = 30, W = 860, H = 160;
-  el("line", { x1: x0, x2: x0 + W, y1: 10 + H, y2: 10 + H, stroke: css("--rule") }, s);
-  let d = ""; e.forEach((v, i) => { const x = x0 + i / e.length * W, h = v / mx * H; if (h > 0.05) d += `M${x.toFixed(1)},${(10 + H).toFixed(1)}V${(10 + H - h).toFixed(1)}`; });
-  el("path", { d, stroke: css("--muted"), "stroke-width": 1 }, s);
-  const xi = x0 + 1347 / e.length * W; el("line", { x1: xi, x2: xi, y1: 10 + H, y2: 10, stroke: css("--fix"), "stroke-width": 3 }, s);
-  el("text", { x: xi + 8, y: 24, class: "t-ink" }, s, "input 1347");
-  [0, 1024, 2048, 3072, 4095].forEach(v => el("text", { x: x0 + v / e.length * W, y: H + 28, "text-anchor": "middle" }, s, v));
-  el("text", { x: x0 + W / 2, y: H + 44, "text-anchor": "middle" }, s, "input channel");
-}
 function drawAll() {
   drawLoop();
   drawResults(); drawCaps($("cap-well").getAttribute("aria-pressed") === "true" ? "wsp_c5" : "sh_c2"); drawTables(); drawLocalize();
   drawGrid(gridM);
   scatter($("sinksc"), [[D.sink_scatter.before, css("--muted")], [D.sink_scatter.after, css("--fix")]], 0.006);
   scatter($("comp"), [[D.comp_scatter.before, css("--muted")], [D.comp_scatter.after, css("--fix")]], 0.2);
-  drawMap2(); readout($("ro-map2"), 1347, true); drawKL();
+  drawKL();
 }
 
 drawAll();
