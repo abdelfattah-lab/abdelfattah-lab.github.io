@@ -230,7 +230,7 @@ img.th-dark { display: none; }
   <p>As quantized, this weight is stored as 0.002591 against a true 0.000496. On tokens 2 and 3, where input 1347 is about 50, that one product is 0.130 instead of 0.025, an excess of 0.105 in output 101; later in the sequence, where the input is 0.01, the same weight error adds only 0.00002. The error is in the weight, and the input decides how much it matters. Across all 2,688 outputs, 86% of the outlier channel's weights are under half the smallest storable value: median error 422%.</p>
   <p><b>The explanation, in one sentence:</b> the most active input in this layer is multiplied by weights stored about 5× too large, because the grid has nothing that small.</p>
 
-  <h3>5. Fix 1, and a surprise</h3>
+  <h3>5. Fix 1: store the outlier channel's weights exactly</h3>
   <p>No 3-bit code can fix this weight: with this scale, nothing smaller than 0.0026 exists. So fix 1 changes the <b>scale</b> instead. The new scale is not searched for or fitted; it follows from three steps:</p>
   <ol>
     <li><b>Make the weight exact.</b> A stored weight is level × <i>s</i>, so for it to equal <i>w</i> the scale must be <i>s</i> = <i>w</i> / level. The weight is positive, so that leaves four candidates, one per positive level: 0.000496 divided by 0.41, 1.25, 2.25 or 3.5 gives 0.0012, 0.0004, 0.0002 or 0.0001.</li>
@@ -255,42 +255,19 @@ img.th-dark { display: none; }
   <div class="fig-note">One dot per output, for 900 of the 2,688 outputs; weights with |<i>w</i>| &lt; 0.006. As quantized, the weights sit in two clouds well off the diagonal, mostly between ±0.002 and ±0.006: each is stored as the smallest value its group can hold, which depends on that group's scale. After fix 1 they lie on the diagonal.</div>
 </div></section>
 <section class="col">
-  <p>On validation, prose KL fell threefold. But chat math got <i>worse</i>: GSM8K-dev went from 93.1% to 85.6%. A fix that only makes weights more correct should not make the model worse, so the explanation was incomplete, and the agent went back to reading.</p>
-
-  <h3>6. The hidden compensation</h3>
-  <p><b>What GPTQ does when it can't store a weight.</b> GPTQ quantizes a matrix one row of <i>W</i> at a time while watching the layer's output on its calibration text. After it stores a row, it adjusts the rows it has not stored yet, so that on the calibration tokens the layer's output stays as close as possible to the original. When one row comes out badly, other rows absorb its error.</p>
-  <p>That is what happened to row 1347. Its weights were stored about 5× too big, which pushes outputs too high on tokens 1–3. GPTQ could not fix that row, so it pushed the outputs back down through other rows, ones whose inputs are also active on the first tokens. We call this <b>bending</b> a row: storing its weights far from their true values, often with the opposite sign, so that the row's contribution cancels row 1347's error. Three weights of row 3492:</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row 3492</th><th>true (NVFP4)</th><th>plain rounding</th><th>stored by GPTQ</th></tr></thead>
-    <tbody>
-    <tr><td>weight a</td><td>−0.0134</td><td>−0.0168</td><td>+0.0471</td></tr>
-    <tr><td>weight b</td><td>+0.0079</td><td>+0.0049</td><td>−0.0418</td></tr>
-    <tr><td>weight c</td><td>+0.0342</td><td>+0.0272</td><td>−0.0272</td></tr>
-    </tbody></table></div>
-  <p class="small">Plain rounding keeps each weight close to its true value. GPTQ stored all three far away and with the opposite sign, on purpose.</p>
-  <p>Two wrongs make an approximate right, but only where GPTQ looked: on the first tokens of its calibration text. On every other token the bent rows are plain error. And once fix 1 stored row 1347 correctly, there was nothing left for them to cancel, so they became error everywhere, including on the chat math that this checkpoint's calibration had covered.</p>
-  <p><b>How the agent found the bent rows</b>, without data:</p>
-  <ol>
-    <li>For every row of <i>W</i>, round the NVFP4 weights to nearest under the scales already stored. That is what the row would hold without compensation.</li>
-    <li>Divide how far GPTQ's stored row is from the true weights by how far the plain rounding is.</li>
-    <li>Flag rows above 3×. GPTQ nudges every row a little, so a normal row sits around 1.1×. In this matrix, 86 rows were 3–14×.</li>
-  </ol>
+  <h3>6. What fix 1 broke: rows that GPTQ had bent</h3>
+  <p>Fix 1 cut prose KL threefold, but chat math got worse: GSM8K-dev fell from 93.1% to 85.6%. Row 1347 was now right; the problem was other rows of the same matrix.</p>
+  <p>When GPTQ quantized this matrix, it could not store row 1347, whose weights came out about 5× too big. So it changed other rows to cancel that error on its calibration text (we call this compensation), storing their weights far from their true values, often with the wrong sign. Once fix 1 stored row 1347 correctly, there was nothing left for them to cancel, and those rows became pure error.</p>
 </section>
-<section class="wide"><div class="fig">
-  <div class="two">
-    <div style="min-width:0"><div class="fig-title">Rows sorted by distance from the true weights (GPTQ ÷ plain rounding)</div>
-      <svg id="scan" viewBox="0 0 900 260" style="width:100%;height:auto" role="img" aria-label="Sorted ratios for three matrices"></svg>
-      <label for="thr" class="small">Threshold: <span id="thr-lbl" class="num"></span>×</label>
-      <input type="range" id="thr" min="1.5" max="8" step="0.1" value="3">
-      <div class="readout" id="scan-ro"></div></div>
-    <div style="min-width:0"><div class="fig-title">Row 3492: true vs stored</div>
-      <canvas id="comp" width="720" height="720" style="width:min(360px,100%);display:block;margin:10px auto 0;image-rendering:auto"></canvas>
-      <div class="legend" style="justify-content:center"><span><i style="background:var(--muted)"></i>as quantized</span><span><i style="background:var(--fix)"></i>after fix 2</span><span>dashed: stored exactly</span></div></div>
-  </div>
-  <div class="fig-note">Left: the 400 worst rows of three matrices; a healthy matrix (layer 7) stays near 1×. Right: each dot is one of row 3492's weights (900 of its 2,688). 97% of its codes differ from plain rounding, many with the wrong sign.</div>
+<section class="col"><div class="fig">
+  <div class="fig-title">Row 3492, one of the bent rows: true vs stored</div>
+  <canvas id="comp" width="720" height="720" style="width:min(360px,100%);display:block;margin:10px auto 0;image-rendering:auto"></canvas>
+  <div class="legend" style="justify-content:center"><span><i style="background:var(--muted)"></i>as quantized</span><span><i style="background:var(--fix)"></i>after fix 2</span><span>dashed: stored exactly</span></div>
+  <div class="fig-note">Each dot is one of row 3492's weights (900 of its 2,688). As quantized, they sit far from the diagonal, many with the wrong sign: 97% of the row's codes differ from plain rounding. After fix 2 they lie close to the diagonal.</div>
 </div></section>
 <section class="col">
-  <p><b>Fix 2:</b> undo the bending. Re-round those 86 rows to nearest, keeping their scales, so each weight goes back next to its true value (the blue dots on the right). Again no data goes in. The scan behind it needs only the stored weights and the NVFP4 weights, and it is cheap enough to run on all 5,959 matrices: its top three are the matrices the agent ended up repairing.</p>
+  <p>The agent found these rows without data. It rounded every row of <i>W</i> to nearest under the scales already stored and compared: in a normal row GPTQ's weights are about 1.1× as far from the true weights as plain rounding; in this matrix 86 rows were 3–14× as far.</p>
+  <p><b>Fix 2:</b> re-round those 86 rows to nearest, keeping their scales. No data goes in. With both fixes, GSM8K-dev rose to 94.7%.</p>
 
   <h3>7. What changed in the matrix</h3>
 </section>
@@ -317,7 +294,7 @@ img.th-dark { display: none; }
   <div class="fig-title">KL to NVFP4 by token position</div>
   <div class="controls"><button class="seg" id="kp-math" aria-pressed="true">chat math</button><button class="seg" id="kp-prose" aria-pressed="false">prose</button></div>
   <svg id="klpos" viewBox="0 0 900 225" style="width:100%;height:auto"></svg>
-  <div class="fig-note">Fix 1 repairs the start of the sequence. On chat math, fix 2 brings KL down at every position, because the compensation was spread over the whole sequence. With both, GSM8K-dev rose to 94.7%.</div>
+  <div class="fig-note">Fix 1 repairs the start of the sequence. On chat math, fix 2 brings KL down at every position, because the bent rows added error on every token.</div>
 </div></section>
 <section class="col">
   <h3>8. Go round again</h3>
@@ -496,15 +473,6 @@ function scatter(canvas, sets, lim) {
 }
 
 /* ---------- scan ---------- */
-const CS = D.comp, CN = { "4": ["layer 4 (outlier channel)", "--fix"], "11": ["layer 11 (outlier channel)", "--deep"], "7": ["layer 7 (healthy)", "--muted"] };
-function drawScan(thr) {
-  const s = $("scan"); s.innerHTML = ""; const keys = ["4", "11", "7"], N = 400;
-  const Y = lineChart(s, keys.map(k => ({ v: CS[k].slice(0, N), c: css(CN[k][1]) })), { xs: [...Array(N).keys()].map(i => i + 1), ylog: true, ymin: 1, ymax: 15, W: 880, H: 200, xticks: [0, 99, 199, 299, 399], xlab: "rows of W, sorted" });
-  el("line", { x1: 50, x2: 880, y1: Y(thr), y2: Y(thr), stroke: css("--damage"), "stroke-dasharray": "5 4", "stroke-width": 1.5 }, s);
-  $("thr-lbl").textContent = thr.toFixed(1);
-  $("scan-ro").innerHTML = keys.map(k => `<div class="${k === "7" ? "" : "bad"}"><div class="k">${CN[k][0]}</div><div class="v num">${CS[k].filter(x => x > thr).length} rows</div></div>`).join("");
-}
-$("thr").oninput = e => drawScan(+e.target.value);
 
 /* ---------- matrix maps ---------- */
 const MX = D.matrix, [MH, MW] = MX.map_shape;
@@ -573,7 +541,7 @@ function drawSkyline() {
 function drawAll() {
   drawLoop();
   drawResults(); drawCaps($("cap-well").getAttribute("aria-pressed") === "true" ? "wsp_c5" : "sh_c2"); drawTables(); drawLocalize();
-  drawGrid(gridM); drawScan(+$("thr").value);
+  drawGrid(gridM);
   scatter($("sinksc"), [[D.sink_scatter.before, css("--muted")], [D.sink_scatter.after, css("--fix")]], 0.006);
   scatter($("comp"), [[D.comp_scatter.before, css("--muted")], [D.comp_scatter.after, css("--fix")]], 0.2);
   drawMap2(); readout($("ro-map2"), 1347, true); drawKL();
