@@ -95,7 +95,7 @@ img.th-dark { display: none; }
   <h1>Repairing a Quantized LLM using Weight Space Programming</h1>
   <div class="byline">November 2026 · Yahya Emara, Chi-Chih Chang, Mohamed Abdelfattah</div>
   <p>We quantize a lot of models. Usually it goes like this: take a checkpoint, squeeze it down to a few bits per weight, watch some benchmark fall off a cliff, then spend a week poking at the calibration set until it mostly comes back. It works, kind of. But it always feels like fixing a watch by shaking it.</p>
-  <p>So we tried something sillier. We handed a broken 3-bit checkpoint to an LLM agent, gave it a Python session with the weights loaded, and asked it to find what went wrong and fix it, by editing the weights directly and without fitting them to any data. On Nemotron-3.5-Lightning-30B-A3B it found two broken matrices out of 5,959, edited about one weight in 120,000, and closed most of the gap to the NVFP4 release.</p>
+  <p>So we tried something sillier, inspired by <a href="https://rikiyat.github.io/blog/weight-space-programming/" target="_blank" rel="noopener">weight-space programming</a>: LLMs can read and edit neural-network weights directly. We handed a broken 3-bit checkpoint to an LLM agent, gave it a Python session with the weights loaded, and asked it to find what went wrong and fix it, by editing the weights directly and without fitting them to any data. On Nemotron-3.5-Lightning-30B-A3B it found two broken matrices out of 5,959, edited about one weight in 120,000, and closed most of the gap to the NVFP4 release.</p>
   <div class="lede-stats">
     <div><b>71.4 → 91.6</b><span>GSM8K, poorly calibrated 3-bit</span></div>
     <div><b>30.8 → 48.6</b><span>LiveCodeBench v6</span></div>
@@ -130,7 +130,7 @@ img.th-dark { display: none; }
   <p>All three treat the quantized model as a black box you can only re-run with different inputs. We wanted to open the box.</p>
 
   <h2>What if the LLM fixes the model itself?</h2>
-  <p>Our starting point is recent weight-space programming work<sup><a href="#r3">3</a></sup>: frontier LLMs can read and write neural network weights directly. In their Experiment 8 the agent makes Qwen3.5-0.8B much better by fixing its reasoning loops, editing 0.016% of its weights, with no gradients and no training loop.</p>
+  <p>Our starting point is <a href="https://rikiyat.github.io/blog/weight-space-programming/" target="_blank" rel="noopener">Sparks of Weight-Space Programming</a><sup><a href="#r3">3</a></sup>, by Takehi et al.: frontier LLMs can read and write neural network weights directly. In their Experiment 8 the agent makes Qwen3.5-0.8B much better by fixing its reasoning loops, editing 0.016% of its weights, with no gradients and no training loop.</p>
   <p>Repairing a quantized checkpoint looked like a natural fit, with one big advantage: we know what every weight is <i>supposed</i> to be, because we have the higher-precision source to compare against. We gave the agent this brief:</p>
   <blockquote>This 3-bit checkpoint should behave like the NVFP4 model. Find what is broken and fix it inside the 3-bit format. You may run the model and read its weights and activations; you may not fit weights to data (no GPTQ, no least-squares refits, no training).</blockquote>
   <p>The agent starts from the finished 3-bit checkpoint, not from NVFP4. The NVFP4 weights are its reference: they tell it how far the 3-bit model is from where it should be, and every new 3-bit value it writes is the NVFP4 weight rounded again under a different rule. Whoever quantizes a model has its source weights, so this needs nothing extra.</p>
@@ -327,7 +327,7 @@ img.th-dark { display: none; }
   <ol class="refs">
     <li id="r1">Frantar, Ashkboos, Hoefler, Alistarh. GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers. ICLR 2023.</li>
     <li id="r2">Lin et al. AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration. MLSys 2024.</li>
-    <li id="r3">Takehi, Teoh, Zhang, Khattab. Sparks of Weight-Space Programming: LLMs can natively read &amp; write neural network weights. November 2026.</li>
+    <li id="r3">Takehi, Teoh, Zhang, Khattab. <a href="https://rikiyat.github.io/blog/weight-space-programming/" target="_blank" rel="noopener">Sparks of Weight-Space Programming: LLMs can natively read &amp; write neural network weights</a>. November 2026.</li>
     <li id="r4">Xiao et al. Efficient Streaming Language Models with Attention Sinks. ICLR 2024.</li>
     <li id="r5">Sun et al. Massive Activations in Large Language Models. COLM 2024.</li>
   </ol>
