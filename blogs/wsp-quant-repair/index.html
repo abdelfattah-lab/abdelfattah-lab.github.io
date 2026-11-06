@@ -293,8 +293,9 @@ img.th-dark { display: none; }
 </section>
 <section class="col">
   <h2>Wrapping up</h2>
-  <p>The whole repair took three rounds of the loop and about 30 tested edits, and kept three: two fixes for the outlier channels and one small one in attention. It rewrites existing quantized codes and scales, so the model keeps the same size, format and kernels. It is a step after quantization that works with any quantizer: all it needs is the checkpoint, the higher-precision reference, and a few prompts to read activations and validate on. And because each edit comes with a reason, it tells you what the quantizer got wrong.</p>
-  <p>Two things next. First, scale the agent editing out: many agents working in parallel on many matrices and models, a swarm instead of one session. Second, start earlier: give agents the full-precision checkpoint and let them produce the quantized model themselves, instead of repairing one after the fact.</p>
+  <p>The whole repair took three rounds of the loop and about 30 tested edits, and kept three: two fixes for the outlier channels and one small one in attention. It rewrites existing quantized codes and scales, so the model keeps the same size, format and kernels.</p>
+  <p>Today, that makes agent editing a finishing pass for any quantized checkpoint, whatever quantizer produced it: it smooths over the places where the quantizer failed and improves the model without quantizing it again. All it needs is the checkpoint, the higher-precision reference, and a few prompts to read activations and validate on. And because each edit comes with a reason, it also tells you what the quantizer got wrong.</p>
+  <p>Longer term, we see this going much further. As LLMs get more capable, we expect agents, or rather swarms of them working in parallel, to quantize models with trillions of parameters themselves, starting from the full-precision weights, instead of only repairing a checkpoint after the fact.</p>
 
   <h2>References</h2>
   <ol class="refs">
