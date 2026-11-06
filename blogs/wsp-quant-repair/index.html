@@ -287,18 +287,6 @@ img.th-dark { display: none; }
   <h3>8. Go round again</h3>
   <p>With layer 4 fixed, the agent repeated the loop. Layer 11's <code>out_proj</code> now stood out, although on the original checkpoint it had looked harmless: layer 4's damage had masked it. It had the same defect on input 3917, and the same two fixes repaired it. A third round found a smaller issue in layer 42's attention, where residual channel 2550 sits near a constant −72; there the agent used the one edit that reads activations, an RMS-weighted choice of one group's scale, which we approved explicitly. After that, no candidate edit helped. The same two rules, unchanged, then repaired the poorly calibrated checkpoint.</p>
 
-  <h3>What used data, and what did not</h3>
-  <div class="scroll"><table>
-    <tbody><tr><th>Step</th><th style="text-align:left">Data</th><th style="text-align:left">What exactly</th></tr>
-    <tr><td>Measure and localize</td><td class="txt">validation text</td><td class="txt">KL to NVFP4 on held-out chat math, code and prose</td></tr>
-    <tr><td>Find the outlier channel</td><td class="txt">activations</td><td class="txt">per-channel input energy on a few dozen sequences; any text works</td></tr>
-    <tr><td>Fix 1</td><td class="txt">none</td><td class="txt">scale = weight / level; round the group to nearest</td></tr>
-    <tr><td>Compensation scan, fix 2</td><td class="txt">none</td><td class="txt">stored weights vs plain rounding of the NVFP4 weights</td></tr>
-    <tr><td>Layer 42 edit (well-calibrated only)</td><td class="txt">one number per channel</td><td class="txt">RMS activation weights one group's rounding error (approved exception)</td></tr>
-    <tr><td>Keep or revert</td><td class="txt">validation</td><td class="txt">KL, perplexity, MMLU-val, GSM8K-dev, LiveCodeBench Jan-2025; never test data</td></tr>
-  </tbody></table></div>
-  <p>Data showed where to look and decided keep or revert. On the poorly calibrated checkpoint, every value written came from the NVFP4 weights and the 8 levels alone; the well-calibrated one also has the layer 42 edit.</p>
-
   <h2>What this means for quantization</h2>
   <p>GPTQ's objective is fine. Its constraint is the problem: it fixes each group's scale from the group's largest weights <i>before</i> choosing codes. When a group also holds a tiny weight on a huge input, no choice of codes can store it, and GPTQ falls back on cancelling the error through other weights, fitted to the calibration tokens and wrong on most others.</p>
   <p>That turns into two cheap tools. A <b>repair pass</b> needs no data: scan for compensation, find the outlier channel in one forward pass, apply both fixes. And <b>constrained GPTQ</b> builds the fix into the quantizer: give such groups a scale that can hold the outlier channel's weight, and quantize those weights first. It uses calibration data like ordinary GPTQ, and it ties the agent edits on every test benchmark:</p>
