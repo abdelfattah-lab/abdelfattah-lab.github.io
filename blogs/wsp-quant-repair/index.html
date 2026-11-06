@@ -289,10 +289,8 @@ img.th-dark { display: none; }
 
   <h2>What this means for quantization</h2>
   <p>GPTQ's objective is fine. Its constraint is the problem: it fixes each group's scale from the group's largest weights <i>before</i> choosing codes. When a group also holds a tiny weight on a huge input, no choice of codes can store it, and GPTQ falls back on cancelling the error through other weights, fitted to the calibration tokens and wrong on most others.</p>
-  <p>That turns into two cheap tools. A <b>repair pass</b> needs no data: scan for compensation, find the outlier channel in one forward pass, apply both fixes. And <b>constrained GPTQ</b> builds the fix into the quantizer: give such groups a scale that can hold the outlier channel's weight, and quantize those weights first. It uses calibration data like ordinary GPTQ, and it ties the agent edits on every test benchmark:</p>
+  <p>That makes the fix cheap: a <b>repair pass</b> that needs no data. Scan for compensation, find the outlier channel in one forward pass, apply both fixes.</p>
 </section>
-<section class="wide"><div class="fig"><div class="scroll"><table id="t-cgptq"></table></div>
-  <div class="fig-note">Constrained GPTQ re-solves the same two matrices completely, so it changes about 6× more codes than the agent edits. The well-calibrated agent-edit row also includes the layer 42 edit.</div></div></section>
 <section class="col">
   <h2>Wrapping up</h2>
   <p>The whole repair took three rounds of the loop and about 30 tested edits, and kept three: two fixes for the outlier channels and one small one in attention. It rewrites existing quantized codes and scales, so the model keeps the same size, format and kernels. It is a step after quantization that works with any quantizer: all it needs is the checkpoint, the higher-precision reference, and a few prompts to read activations and validate on. And because each edit comes with a reason, it tells you what the quantizer got wrong.</p>
@@ -365,11 +363,6 @@ function drawTables() {
   table("t-measure", ["KL to NVFP4", "chat math", "code", "prose"], [
     { v: ["Well-calibrated 3-bit", DS.A.math.toFixed(3), DS.A.code.toFixed(3), DS.A.prose.toFixed(3)] },
     { v: ["Poorly calibrated 3-bit", DS.A_sharar.math.toFixed(3), DS.A_sharar.code.toFixed(3), DS.A_sharar.prose.toFixed(3)] }]);
-  table("t-cgptq", ["Start", "Repair", "Weights edited", ...BENCH], [
-    { v: ["Poorly calibrated", "agent edits", "0.0008%", ...POORE.map(f)], cls: "hi" },
-    { v: ["Poorly calibrated", "constrained GPTQ", "0.0062%", ...[91.6, 81.8, 48.9, 63.3, 74.2, 9.35].map(f)] },
-    { v: ["Well-calibrated", "agent edits", "0.001%", ...WELLE.map(f)], cls: "hi" },
-    { v: ["Well-calibrated", "constrained GPTQ", "0.0055%", ...[92.6, 83.2, 43.0, 63.9, 73.9, 8.94].map(f)] }]);
 }
 function bars(svg, rows, x0, w) { const cols = [css("--muted"), css("--deep"), css("--fix")];
   rows.forEach((r, i) => { const y = 4 + i * 32; el("text", { x: 0, y: y + 15 }, svg, r.label);
