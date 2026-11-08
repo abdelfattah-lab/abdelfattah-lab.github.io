@@ -133,6 +133,7 @@ img.th-dark { display: none; }
   <p>Repairing a quantized checkpoint looked like a natural fit, with one big advantage: we know what every weight is <i>supposed</i> to be, because we have the higher-precision source to compare against. We gave the agent this brief:</p>
   <blockquote>This 3-bit checkpoint should behave like the NVFP4 model. Find what is broken and fix it inside the 3-bit format. You may run the model and read its weights and activations; you may not fit weights to data (no GPTQ, no least-squares refits, no training).</blockquote>
   <p>The agent starts from the finished 3-bit checkpoint, not from NVFP4. The NVFP4 weights are its reference: they tell it how far the 3-bit model is from where it should be, and every new 3-bit value it writes is the NVFP4 weight rounded again under a different rule. Whoever quantizes a model has its source weights, so this needs nothing extra.</p>
+  <p>The full prompt, with the rules, the loop and the tools to run it on your own checkpoint, is on GitHub: <a href="https://github.com/yahya010/wsp-ptq" target="_blank" rel="noopener">wsp-ptq</a>.</p>
 </section>
 <section class="wide">
   <div class="fig">
@@ -168,7 +169,7 @@ img.th-dark { display: none; }
 </section>
 
 <section class="col">
-  <div class="kicker">Case study</div>
+  <div class="kicker"><br></div>
   <h2 style="margin-top:.4rem">How the agent found the defect, and how it fixed it</h2>
   <p>Everything here was done by reading tensors and printing numbers in a Python session. We follow the agent's fixes on the well-calibrated checkpoint.</p>
 
@@ -244,7 +245,7 @@ img.th-dark { display: none; }
     <tr class="hi"><td>Fix 1</td><td>0.0012</td><td>±0.0005 ±0.0015 ±0.0027 ±0.0042</td><td>0.000486 (2% off)</td><td>0.0042 (clipped)</td><td>0.07 × 10⁻⁴</td></tr>
     </tbody></table></div>
   <p class="small">Group error: each weight's squared error times its channel's input energy, summed over the 32 weights.</p>
-  <p><b>The price.</b> Fix 1 trades rounding error for <b>clipping error</b>: a weight larger than the largest storable value is stored as that value. With the smaller scale, the largest value the group can store falls from 0.0223 to 0.0042, so 27 of the other 31 weights are clipped to it. Those weights are now much worse, yet the group's error falls 18×, because their channels' inputs are tiny: as quantized, 82% of the group's error came from channel 1347 alone. The figure above plays this change: the levels shrink until one sits on the blue weight, and the large weights are clipped to the outermost level.</p>
+  <p>Fix 1 trades rounding error for <b>clipping error</b>: a weight larger than the largest storable value is stored as that value. With the smaller scale, the largest value the group can store falls from 0.0223 to 0.0042, so 27 of the other 31 weights are clipped to it. Those weights are now much worse, yet the group's error falls 18×, because their channels' inputs are tiny: as quantized, 82% of the group's error came from channel 1347 alone. The figure above plays this change: the levels shrink until one sits on the blue weight, and the large weights are clipped to the outermost level.</p>
   <p><b>Across the matrix.</b> The same rule runs once per output: for each of the 2,688 outputs, it rewrites one scale (the group holding input 1347) and re-rounds the 32 codes under it. That is 2,688 scales and 85,286 changed codes. Only the NVFP4 weights, the 8 levels and the scale format go in; no data. Across all 2,688 outputs, the outlier channel's median weight error drops from 422% to under 2%.</p>
 </section>
 <section class="col"><div class="fig">
@@ -305,7 +306,7 @@ img.th-dark { display: none; }
     <li id="r5">Sun et al. Massive Activations in Large Language Models. COLM 2024.</li>
   </ol>
   <p class="small" id="n1">* Both checkpoints use the same 3-bit format (8 levels per matrix, an FP8 scale per 32 weights). The poorly calibrated one was calibrated on a small, narrow set: 64 code files plus a few hundred model-generated reasoning traces and MMLU answers; the well-calibrated one on an equal mix of six domains (code, math answers, prose, chat, multilingual chat, knowledge questions). Neither calibration set overlaps the test sets.</p>
-  <footer>Checkpoints on Hugging Face: <a href="https://huggingface.co/yemara/Nemotron-3.5-Lightning-30B-A3B-W3-WSP-PoorlyCalibrated" target="_blank" rel="noopener">poorly calibrated + agent edits</a> · <a href="https://huggingface.co/yemara/Nemotron-3.5-Lightning-30B-A3B-W3-WSP-WellCalibrated" target="_blank" rel="noopener">well-calibrated + agent edits</a>.</footer>
+  <footer>Checkpoints on Hugging Face: <a href="https://huggingface.co/yemara/Nemotron-3.5-Lightning-30B-A3B-W3-WSP-PoorlyCalibrated" target="_blank" rel="noopener">poorly calibrated + agent edits</a> · <a href="https://huggingface.co/yemara/Nemotron-3.5-Lightning-30B-A3B-W3-WSP-WellCalibrated" target="_blank" rel="noopener">well-calibrated + agent edits</a>. Prompt and code: <a href="https://github.com/yahya010/wsp-ptq" target="_blank" rel="noopener">github.com/yahya010/wsp-ptq</a>.</footer>
 </section>
 <section class="col"><script src="https://utteranc.es/client.js" repo="abdelfattah-lab/abdelfattah-lab.github.io" issue-term="pathname" label="blog_comment" theme="preferred-color-scheme" crossorigin="anonymous" async></script></section>
 </div>
