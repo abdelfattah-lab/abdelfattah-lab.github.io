@@ -363,7 +363,7 @@ const DS = D.discover;
 function drawTables() {
   table("t-measure", ["KL to NVFP4", "chat math", "code", "prose"], [
     { v: ["Well-calibrated 3-bit", DS.A.math.toFixed(3), DS.A.code.toFixed(3), DS.A.prose.toFixed(3)] },
-    { v: ["Poorly calibrated 3-bit", DS.A_sharar.math.toFixed(3), DS.A_sharar.code.toFixed(3), DS.A_sharar.prose.toFixed(3)] }]);
+    { v: ["Poorly calibrated 3-bit", DS.A_poor.math.toFixed(3), DS.A_poor.code.toFixed(3), DS.A_poor.prose.toFixed(3)] }]);
 }
 function bars(svg, rows, x0, w) { const cols = [css("--muted"), css("--deep"), css("--fix")];
   rows.forEach((r, i) => { const y = 4 + i * 32; el("text", { x: 0, y: y + 15 }, svg, r.label);
